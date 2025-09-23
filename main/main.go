@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-
 	"log"
 
+	"github.com/iotames/cdnguard"
+	cdnsql "github.com/iotames/cdnguard/main/sql"
 	"github.com/iotames/easyconf"
 	"github.com/iotames/easydb"
 	"github.com/iotames/easyserver/httpsvr"
@@ -14,9 +15,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const DEFALUT_SQL_DIR = "sql"
+
+var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
 var DbPort, WebPort int
-
 var d *easydb.EasyDb
 
 func main() {
@@ -64,27 +67,17 @@ func init() {
 	cf.StringVar(&DbHost, "DB_HOST", "172.16.160.12", "数据库主机地址")
 	cf.StringVar(&DbUser, "DB_USER", "postgres", "数据库用户名")
 	cf.StringVar(&DbPassword, "DB_PASSWORD", "postgres", "数据库密码")
-	cf.StringVar(&DbName, "DB_NAME", "qiniudb", "数据库名称")
+	cf.StringVar(&DbName, "DB_NAME", "postgres", "数据库名称")
 	cf.IntVar(&DbPort, "DB_PORT", 5432, "数据库端口")
 	cf.IntVar(&WebPort, "WEB_PORT", 1212, "web服务端口")
+	cf.StringVar(&SqlDir, "SQL_DIR", DEFALUT_SQL_DIR, "sql文件目录")
 	cf.Parse()
 
-	sqlCreateTable := `CREATE TABLE IF NOT EXISTS qiniu_cdnauth_requests (
-        id SERIAL PRIMARY KEY,
-		request_id int8,
-		client_ip VARCHAR(45),
-		x_forwarded_for VARCHAR(255),
-		user_agent VARCHAR(500),
-		http_referer VARCHAR(255),
-		request_url varchar(1000) NOT NULL,
-		request_headers json NOT NULL,
-		raw_url varchar(1000) NOT NULL,
-		deleted_at timestamp NULL,
-		created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-		updated_at timestamp DEFAULT CURRENT_TIMESTAMP
-    );
-CREATE INDEX IF NOT EXISTS "IDX_client_ip" ON qiniu_cdnauth_requests USING btree (client_ip);
-CREATE INDEX IF NOT EXISTS "IDX_http_referer" ON qiniu_cdnauth_requests USING btree (http_referer);`
+	sqldir := cdnguard.NewScriptDir(SqlDir, DEFALUT_SQL_DIR, cdnsql.GetSqlFs())
+	sqlCreateTable, err := sqldir.GetSQL("tables_init.sql")
+	if err != nil {
+		panic(err)
+	}
 
 	d = easydb.NewEasyDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
 	// 测试连接d
