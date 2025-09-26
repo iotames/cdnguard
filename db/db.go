@@ -6,8 +6,13 @@ import (
 	"github.com/iotames/easydb"
 )
 
+type ISqlDir interface {
+	GetSQL(fpath string, replaceList ...string) (string, error)
+}
+
 type DB struct {
-	*easydb.EasyDb
+	edb    *easydb.EasyDb
+	sqlDir ISqlDir
 }
 
 var once sync.Once
@@ -30,15 +35,15 @@ func NewDb(driverName, dbHost, dbUser, dbPassword, dbName string, dbPort int) *D
 	if err = d.Ping(); err != nil {
 		panic(err)
 	}
-	return &DB{d}
+	return &DB{d, nil}
 }
 
-func (d DB) CreateTables(sqltxt string) {
-	var err error
-	_, err = d.Exec(sqltxt)
-	if err != nil {
-		panic(err)
-	}
+func (d *DB) SetSqlDir(sqldir ISqlDir) {
+	d.sqlDir = sqldir
+}
+
+func (d DB) CloseDb() error {
+	return d.edb.CloseDb()
 }
 
 // SELECT client_ip, COUNT(*) AS request_count

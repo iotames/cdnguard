@@ -5,26 +5,22 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/iotames/cdnguard/db"
 	"github.com/iotames/easyserver/httpsvr"
 	"github.com/iotames/easyserver/response"
-	_ "github.com/lib/pq"
 )
 
 func cdnauth(ctx httpsvr.Context) {
 	var err error
 	var hdrb []byte
 	var sqlresult sql.Result
-	d := db.GetDb(nil)
-
-	sql := `INSERT INTO qiniu_cdnauth_requests (request_id,client_ip,x_forwarded_for,user_agent,http_referer,request_url,request_headers,raw_url) VALUES ($1,$2,$3,$4,$5,$6,$7, $8)`
+	d := GetDB()
 	q := ctx.Request.URL.Query()
 	request_headers := ""
 	hdrb, err = json.Marshal(ctx.Request.Header)
 	if err == nil {
 		request_headers = string(hdrb)
 	}
-	sqlresult, err = d.Exec(sql,
+	sqlresult, err = d.AddRequest(
 		q.Get("clientrequestid"),
 		q.Get("clientip"),
 		q.Get("clientxforwardedfor"),

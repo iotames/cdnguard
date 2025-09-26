@@ -17,28 +17,16 @@ var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
 var DbPort, WebPort int
 
-func init() {
-	parseArgs()
-	dbinit()
-
-}
-
 func dbinit() {
 	d := db.NewDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
 	sqldir := cdnguard.NewScriptDir(cdnsql.GetSqlFs(), SqlDir, DEFALUT_SQL_DIR)
-	tables_init, err := sqldir.GetSQL("tables_init.sql")
-	if err != nil {
-		panic(err)
-	}
-	d.CreateTables(tables_init)
+	d.SetSqlDir(sqldir)
+	d.CreateTables()
 	db.GetDb(d)
 }
 
 func runserver() {
 	var err error
-	// 关闭整个d连接池
-	d := db.GetDb(nil)
-	defer d.CloseDb()
 	s := webserver.NewWebServer(WebPort)
 	if err = s.ListenAndServe(); err != nil {
 		panic(err)
@@ -48,7 +36,7 @@ func runserver() {
 func parseArgs() {
 	cf := easyconf.NewConf()
 	cf.StringVar(&DbDriverName, "DB_DRIVER_NAME", "postgres", "数据库驱动名称")
-	cf.StringVar(&DbHost, "DB_HOST", "172.16.160.12", "数据库主机地址")
+	cf.StringVar(&DbHost, "DB_HOST", "127.0.0.1", "数据库主机地址")
 	cf.StringVar(&DbUser, "DB_USER", "postgres", "数据库用户名")
 	cf.StringVar(&DbPassword, "DB_PASSWORD", "postgres", "数据库密码")
 	cf.StringVar(&DbName, "DB_NAME", "postgres", "数据库名称")

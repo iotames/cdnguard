@@ -28,4 +28,22 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_block_requests (
 		deleted_at timestamp NULL,
 		created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 		updated_at timestamp DEFAULT CURRENT_TIMESTAMP
-)
+);
+CREATE INDEX IF NOT EXISTS "IDX_client_ip_block_requests" ON qiniu_cdnauth_block_requests USING btree (client_ip);
+
+----------- ip_white_list, ip_black_list
+CREATE TABLE IF NOT EXISTS qiniu_cdnauth_ip_white_list (
+        id SERIAL PRIMARY KEY,
+		ip VARCHAR(45) NOT NULL,
+		deleted_at timestamp NULL,
+		created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+		updated_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS qiniu_cdnauth_ip_black_list (
+        id SERIAL PRIMARY KEY,
+		ip VARCHAR(45) NOT NULL,
+		deleted_at timestamp NULL,
+		created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+		updated_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
