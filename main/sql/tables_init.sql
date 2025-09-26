@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_requests (
 		updated_at timestamp DEFAULT CURRENT_TIMESTAMP
     );
 CREATE INDEX IF NOT EXISTS "IDX_client_ip" ON qiniu_cdnauth_requests USING btree (client_ip);
+CREATE INDEX IF NOT EXISTS "IDX_created_at_client_ip" ON qiniu_cdnauth_requests USING btree (created_at, client_ip);
 CREATE INDEX IF NOT EXISTS "IDX_http_referer" ON qiniu_cdnauth_requests USING btree (http_referer);
 
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_block_requests (
