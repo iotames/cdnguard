@@ -3,16 +3,14 @@ package db
 import (
 	"sync"
 
+	"github.com/iotames/cdnguard/contract"
 	"github.com/iotames/easydb"
+	_ "github.com/lib/pq"
 )
-
-type ISqlDir interface {
-	GetSQL(fpath string, replaceList ...string) (string, error)
-}
 
 type DB struct {
 	edb    *easydb.EasyDb
-	sqlDir ISqlDir
+	sqlDir contract.ISqlDir
 }
 
 var once sync.Once
@@ -38,20 +36,10 @@ func NewDb(driverName, dbHost, dbUser, dbPassword, dbName string, dbPort int) *D
 	return &DB{d, nil}
 }
 
-func (d *DB) SetSqlDir(sqldir ISqlDir) {
+func (d *DB) SetSqlDir(sqldir contract.ISqlDir) {
 	d.sqlDir = sqldir
 }
 
 func (d DB) CloseDb() error {
 	return d.edb.CloseDb()
 }
-
-// SELECT client_ip, COUNT(*) AS request_count
-// FROM public.qiniu_cdnauth_requests
-// WHERE created_at >= NOW() - INTERVAL '10 minutes'
-// --WHERE created_at >= NOW() - INTERVAL '1 hour'
-// GROUP BY client_ip
-// ORDER BY request_count DESC
-// LIMIT 10;
-// -- 最近10分钟内网络请求最频繁的前10名IP
-// -- 最近1小时内网络请求最频繁的前10名IP

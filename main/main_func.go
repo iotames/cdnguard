@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/iotames/cdnguard"
@@ -8,21 +9,22 @@ import (
 	cdnsql "github.com/iotames/cdnguard/main/sql"
 	"github.com/iotames/cdnguard/webserver"
 	"github.com/iotames/easyconf"
-	_ "github.com/lib/pq"
 )
 
 const DEFALUT_SQL_DIR = "sql"
 
+var gdb *db.DB
 var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
 var DbPort, WebPort int
 
 func dbinit() {
-	d := db.NewDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
+	gdb = db.NewDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
 	sqldir := cdnguard.NewScriptDir(cdnsql.GetSqlFs(), SqlDir, DEFALUT_SQL_DIR)
-	d.SetSqlDir(sqldir)
-	d.CreateTables()
-	db.GetDb(d)
+	gdb.SetSqlDir(sqldir)
+	gdb.CreateTables()
+	// 调用GetDb方法，传入gdb。以便其他模块使用GetDb(nil)获取全局单例
+	db.GetDb(gdb)
 }
 
 func runserver() {
@@ -46,4 +48,6 @@ func parseArgs() {
 	if err := cf.Parse(); err != nil {
 		log.Fatal(err)
 	}
+	flag.BoolVar(&Debug, "debug", false, "debug mode")
+	flag.Parse()
 }

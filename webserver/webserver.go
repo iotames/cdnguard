@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/iotames/easyserver/httpsvr"
-	_ "github.com/lib/pq"
 )
 
 func NewWebServer(port int) *httpsvr.EasyServer {

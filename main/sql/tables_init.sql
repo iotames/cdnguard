@@ -35,6 +35,7 @@ CREATE INDEX IF NOT EXISTS "IDX_client_ip_block_requests" ON qiniu_cdnauth_block
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_ip_white_list (
         id SERIAL PRIMARY KEY,
 		ip VARCHAR(45) NOT NULL,
+		title VARCHAR(64) DEFAULT NULL,
 		deleted_at timestamp NULL,
 		created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 		updated_at timestamp DEFAULT CURRENT_TIMESTAMP
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_ip_white_list (
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_ip_black_list (
         id SERIAL PRIMARY KEY,
 		ip VARCHAR(45) NOT NULL,
+		title VARCHAR(64) DEFAULT NULL,
 		deleted_at timestamp NULL,
 		created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 		updated_at timestamp DEFAULT CURRENT_TIMESTAMP

@@ -5,30 +5,62 @@ import (
 	"encoding/json"
 	"log"
 
+	"slices"
+
 	"github.com/iotames/easyserver/httpsvr"
-	"github.com/iotames/easyserver/response"
 )
 
 func cdnauth(ctx httpsvr.Context) {
 	var err error
 	var hdrb []byte
-	var sqlresult sql.Result
-	d := GetDB()
 	q := ctx.Request.URL.Query()
 	request_headers := ""
 	hdrb, err = json.Marshal(ctx.Request.Header)
 	if err == nil {
 		request_headers = string(hdrb)
 	}
+
+	areq := CdnAuthRequest{
+		Id:            q.Get("clientrequestid"),
+		Ip:            q.Get("clientip"),
+		XForwardedFor: q.Get("clientxforwardedfor"),
+		UserAgent:     q.Get("clientua"),
+		Referer:       q.Get("clientreferer"),
+		RequestUrl:    q.Get("requesturl"),
+		Headers:       request_headers,
+		RawUrl:        ctx.Request.URL.String(),
+	}
+
+	// IP白名单PASS
+	okips, _ := GetDB().GetIpWhiteList()
+	if slices.Contains(okips, areq.Ip) {
+		AddRequest(areq)
+		success(ctx)
+		return
+	}
+	// 添加到黑名单BLOCK
+
+	AddRequest(areq)
+	success(ctx)
+}
+
+type CdnAuthRequest struct {
+	Id, Ip, XForwardedFor, UserAgent, Referer, RequestUrl, Headers, RawUrl string
+}
+
+func AddRequest(areq CdnAuthRequest) error {
+	var err error
+	var sqlresult sql.Result
+	d := GetDB()
 	sqlresult, err = d.AddRequest(
-		q.Get("clientrequestid"),
-		q.Get("clientip"),
-		q.Get("clientxforwardedfor"),
-		q.Get("clientua"),
-		q.Get("clientreferer"),
-		q.Get("requesturl"),
-		request_headers,
-		ctx.Request.URL.String(),
+		areq.Id,
+		areq.Ip,
+		areq.XForwardedFor,
+		areq.UserAgent,
+		areq.Referer,
+		areq.RequestUrl,
+		areq.Headers,
+		areq.RawUrl,
 	)
 	if err != nil {
 		log.Println("sqlresult error:", err)
@@ -37,5 +69,5 @@ func cdnauth(ctx httpsvr.Context) {
 		n, err = sqlresult.RowsAffected()
 		log.Println("SUCCESS sqlresult:", n, err)
 	}
-	ctx.Writer.Write(response.NewApiDataOk("success").Bytes())
+	return err
 }

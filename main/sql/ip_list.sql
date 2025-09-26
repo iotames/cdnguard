@@ -1,0 +1,1 @@
+SELECT ip from ? WHERE deleted_at IS NULL;
