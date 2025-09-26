@@ -10,8 +10,8 @@ import (
 )
 
 type ScriptDir struct {
-	DefaultDir, CustomDir string
-	embedFS               embed.FS
+	embedFS embed.FS
+	dirList []string
 }
 
 var onesd *ScriptDir
@@ -28,23 +28,11 @@ func GetScriptDir(sd *ScriptDir) *ScriptDir {
 	return onesd
 }
 
-// NewScriptDir 初始化一个程序运行时所需的外部脚本文件目录。
-func NewScriptDir(customDir, defaultDir string, embedFs embed.FS) *ScriptDir {
-	return &ScriptDir{DefaultDir: defaultDir, CustomDir: customDir, embedFS: embedFs}
-}
-
-// GetSQL 获取sql文本
-// replaceList 字符串列表，依次替换SQL文本中的?占位符
-// TODO 需要强调占位符与通配符的区别，比如%和_在LIKE子句中不是占位符，而是通配符，需要和参数化查询中的占位符区分开。
-func (s ScriptDir) GetSQL(fpath string, replaceList ...string) (string, error) {
-	sqlTxt, err := s.GetScriptText(fpath)
-	if err != nil {
-		return "", err
-	}
-	for _, rerplaceStr := range replaceList {
-		sqlTxt = strings.Replace(sqlTxt, "?", rerplaceStr, 1)
-	}
-	return sqlTxt, nil
+// NewScriptDir 初始化程序运行时所需的外部脚本文件目录。
+// 如果在给定的所有目录中找不到所需文件，则从embedFs中获取。
+// 如果在first_dir找到所需文件，则优先获取。否则继续从more_dirs文件列表中依次获取。
+func NewScriptDir(embedFs embed.FS, first_dir string, more_dirs ...string) *ScriptDir {
+	return &ScriptDir{embedFS: embedFs, dirList: append([]string{first_dir}, more_dirs...)}
 }
 
 func (s ScriptDir) OkDir(d string) error {
@@ -76,12 +64,14 @@ func (s ScriptDir) OkNormalFile(d string) error {
 }
 
 // GetScriptText 获取脚本文件的纯文本内容
-// 优先从CustomDir自定义目录查找文件。如找不到，则从DefaultDir默认目录查找。如再找不到文件，则从内嵌文件中读取。
+// 优先从dirList目录列表中查找文件。如找不到，最后从内嵌文件中读取。
 func (s ScriptDir) GetScriptText(fpath string) (stxt string, err error) {
 	var b []byte
-	customDirPath := filepath.Join(s.CustomDir, fpath)
-	defaultFilePath := filepath.Join(s.DefaultDir, fpath)
-	realfpath := s.getExistFile(customDirPath, defaultFilePath)
+	var filepaths []string
+	for _, d := range s.dirList {
+		filepaths = append(filepaths, filepath.Join(d, fpath))
+	}
+	realfpath := s.GetFirstExistFile(filepaths...)
 	if realfpath != "" {
 		// 找到目标文件
 		b, err = os.ReadFile(realfpath)
@@ -91,8 +81,7 @@ func (s ScriptDir) GetScriptText(fpath string) (stxt string, err error) {
 		// 文件内容不为空，读取没有错误
 		return stxt, err
 	}
-	// 找不到文件，获取读取了文件内容为空。从内嵌的文件中读取sql文件
-
+	// 找不到文件，或者虽然找到文件，但文件内容为空或读取错误。则从内嵌的文件中读取sql文件
 	b, err = s.embedFS.ReadFile(fpath)
 	if err != nil {
 		return stxt, err
@@ -101,12 +90,26 @@ func (s ScriptDir) GetScriptText(fpath string) (stxt string, err error) {
 	return stxt, err
 }
 
-func (s ScriptDir) getExistFile(customFilePath string, defaultFilePath string) string {
-	if s.OkNormalFile(customFilePath) == nil {
-		return customFilePath
-	}
-	if s.OkNormalFile(defaultFilePath) == nil {
-		return defaultFilePath
+// GetFirstExistFile 从给定的多个文件种，获取第一个存在的文件。
+func (s ScriptDir) GetFirstExistFile(filelist ...string) string {
+	for _, f := range filelist {
+		if s.OkNormalFile(f) == nil {
+			return f
+		}
 	}
 	return ""
+}
+
+// GetSQL 获取sql文本
+// replaceList 字符串列表，依次替换SQL文本中的?占位符
+// TODO 需要强调占位符与通配符的区别，比如%和_在LIKE子句中不是占位符，而是通配符，需要和参数化查询中的占位符区分开。
+func (s ScriptDir) GetSQL(fpath string, replaceList ...string) (string, error) {
+	sqlTxt, err := s.GetScriptText(fpath)
+	if err != nil {
+		return "", err
+	}
+	for _, rerplaceStr := range replaceList {
+		sqlTxt = strings.Replace(sqlTxt, "?", rerplaceStr, 1)
+	}
+	return sqlTxt, nil
 }
