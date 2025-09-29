@@ -38,8 +38,17 @@ func cdnauth(ctx httpsvr.Context) {
 		success(ctx)
 		return
 	}
-	// 添加到黑名单BLOCK
 
+	// IP黑名单BLOCK
+	okips, _ = GetDB().GetIpBlackList()
+	if slices.Contains(okips, areq.Ip) {
+		fail(ctx)
+		log.Println("error:ip blacklist Block:", areq.Ip)
+		// TODO 添加到block_requests
+		return
+	}
+
+	// 10分钟或者1小时，更新一次IP黑名单。go func(){}添加到黑名单
 	AddRequest(areq)
 	success(ctx)
 }

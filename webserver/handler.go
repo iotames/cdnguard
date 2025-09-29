@@ -17,3 +17,8 @@ func GetDB() *db.DB {
 func success(ctx httpsvr.Context) {
 	ctx.Writer.Write(response.NewApiDataOk("success").Bytes())
 }
+
+func fail(ctx httpsvr.Context) {
+	// status=404
+	ctx.Writer.Write(response.NewApiDataUnauthorized().Bytes())
+}

@@ -39,6 +39,6 @@ func (d DB) Prune() error {
 		return err
 	}
 	rownum, err := result.RowsAffected()
-	log.Printf("-----PruneRequest---RowsAffected(%d)---\n", rownum)
+	log.Printf("-----PruneRequests---RowsAffected(%d)---\n", rownum)
 	return err
 }
