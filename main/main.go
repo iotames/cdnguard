@@ -10,15 +10,13 @@ func main() {
 	// 关闭整个d连接池
 	d := db.GetDb(nil)
 	defer d.CloseDb()
-	if Debug {
-		debug()
+	if extCmdRun() {
 		return
 	}
 	runserver()
 }
 
 func init() {
-
-	parseArgs()
+	parseRunArgs()
 	dbinit()
 }

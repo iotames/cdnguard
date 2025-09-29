@@ -1,7 +1,6 @@
 package webserver
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 
@@ -30,6 +29,7 @@ func cdnauth(ctx httpsvr.Context) {
 		Headers:       request_headers,
 		RawUrl:        ctx.Request.URL.String(),
 	}
+	// TODO 请求头没有accept-language可能是爬虫
 
 	// IP白名单PASS
 	okips, _ := GetDB().GetIpWhiteList()
@@ -50,9 +50,8 @@ type CdnAuthRequest struct {
 
 func AddRequest(areq CdnAuthRequest) error {
 	var err error
-	var sqlresult sql.Result
 	d := GetDB()
-	sqlresult, err = d.AddRequest(
+	_, err = d.AddRequest(
 		areq.Id,
 		areq.Ip,
 		areq.XForwardedFor,
@@ -63,11 +62,7 @@ func AddRequest(areq CdnAuthRequest) error {
 		areq.RawUrl,
 	)
 	if err != nil {
-		log.Println("sqlresult error:", err)
-	} else {
-		var n int64
-		n, err = sqlresult.RowsAffected()
-		log.Println("SUCCESS sqlresult:", n, err)
+		log.Println("error: AddRequest sqlresult Fail:", err)
 	}
 	return err
 }
