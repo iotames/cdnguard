@@ -1,15 +1,11 @@
--- SELECT 
---     client_ip, 
---     COUNT(*) AS request_count
--- FROM public.qiniu_cdnauth_requests
+-- WHERE created_at >= NOW() - INTERVAL '10 minutes'
 -- WHERE created_at > CURRENT_DATE + INTERVAL '1 hours'
 --   AND created_at < CURRENT_DATE + INTERVAL '5 hours'
--- GROUP BY client_ip
--- ORDER BY request_count DESC
--- LIMIT 20;
--- -- WHERE created_at >= NOW() - INTERVAL '10 minutes'
+
 
 -- 当天凌晨01:00到05:00的请求数统计 1 hours,5 hours
+-- r.http_referer is NULL 为异常请求
+-- 排除了白名单里面的IP
 SELECT
     r.client_ip ip, 
     COUNT(*) AS request_count
@@ -24,4 +20,4 @@ WHERE r.created_at > $1
   )
 GROUP BY r.client_ip
 ORDER BY request_count DESC
-LIMIT 15;
+LIMIT 30;

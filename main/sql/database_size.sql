@@ -1,5 +1,5 @@
 -- 查看数据库大小
-SELECT pg_size_pretty(pg_database_size('qiniudb')) AS dbsize;
+SELECT pg_size_pretty(pg_database_size($1)) AS dbsize;
 -- SELECT pg_database_size('qiniudb');
 
 -- -- 查看表大小

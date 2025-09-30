@@ -17,7 +17,7 @@ var gdb *db.DB
 var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
 var DbPort, WebPort int
-var Prune bool
+var Debug, Prune, AddBlackIps bool
 
 func dbinit() {
 	gdb = db.NewDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
@@ -58,6 +58,7 @@ func parseConf() {
 func parseCmd() {
 	flag.BoolVar(&Debug, "debug", false, "debug mode")
 	flag.BoolVar(&Prune, "prune", false, "prune db")
+	flag.BoolVar(&AddBlackIps, "addblackips", false, "Add IP list to Black IP List")
 	flag.Parse()
 }
 

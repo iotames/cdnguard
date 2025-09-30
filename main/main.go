@@ -4,8 +4,6 @@ import (
 	"github.com/iotames/cdnguard/db"
 )
 
-var Debug bool
-
 func main() {
 	// 关闭整个d连接池
 	d := db.GetDb(nil)

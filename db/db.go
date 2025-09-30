@@ -9,8 +9,9 @@ import (
 )
 
 type DB struct {
-	edb    *easydb.EasyDb
-	sqlDir contract.ISqlDir
+	edb     *easydb.EasyDb
+	sqlDir  contract.ISqlDir
+	dsnConf *easydb.DsnConf
 }
 
 var once sync.Once
@@ -28,12 +29,13 @@ func GetDb(oncedb *DB) *DB {
 
 func NewDb(driverName, dbHost, dbUser, dbPassword, dbName string, dbPort int) *DB {
 	var err error
-	d := easydb.NewEasyDb(driverName, dbHost, dbUser, dbPassword, dbName, dbPort)
+	cf := easydb.NewDsnConf(driverName, dbHost, dbUser, dbPassword, dbName, dbPort)
+	d := easydb.NewEasyDbByConf(*cf)
 	// 测试连接d
 	if err = d.Ping(); err != nil {
 		panic(err)
 	}
-	return &DB{d, nil}
+	return &DB{d, nil, cf}
 }
 
 func (d *DB) SetSqlDir(sqldir contract.ISqlDir) {

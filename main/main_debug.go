@@ -17,8 +17,11 @@ func debug() {
 		panic(err)
 	}
 	log.Printf("------debug---GetIpWhiteList(%v)---\n", list)
-	err = cdnguard.AddBlackIpList()
+	ips, err := cdnguard.GetTopRequestIpToday(1, 5)
 	if err != nil {
 		panic(err)
+	}
+	for _, ip := range ips {
+		log.Printf("---------RequestIpBlackList--ip( %s )--count(%d)-----\n", ip.Ip, ip.RequestCount)
 	}
 }

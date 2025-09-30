@@ -19,6 +19,11 @@ func (d DB) AddBlockRequest(args ...any) (sql.Result, error) {
 	return d.ExecSqlFile("block_requests_insert.sql", args...)
 }
 
+// AddIpToBlackList 添加IP到黑名单
+func (d DB) AddIpToBlackList(ip, title string, black_type int) (sql.Result, error) {
+	return d.ExecSqlFile("ip_black_list_insert.sql", ip, title, black_type)
+}
+
 // GetTopRequestIps 获取指定时间范围内，请求数最高的IP列表
 // topIps: ip, request_count
 // created_at > CURRENT_DATE + INTERVAL '1 hours'
@@ -29,7 +34,7 @@ func (d DB) GetTopRequestIps(topIps any, startAt, endAt any) error {
 
 func (d DB) GetDbSizeText() (string, error) {
 	var sizetxt string
-	err := d.GetOneBySqlFile("database_size.sql", []any{&sizetxt})
+	err := d.GetOneBySqlFile("database_size.sql", []any{&sizetxt}, d.dsnConf.DbName)
 	return sizetxt, err
 }
 
