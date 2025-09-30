@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+
+	"github.com/iotames/cdnguard"
 )
 
 func debug() {
@@ -15,4 +17,8 @@ func debug() {
 		panic(err)
 	}
 	log.Printf("------debug---GetIpWhiteList(%v)---\n", list)
+	err = cdnguard.AddBlackIpList()
+	if err != nil {
+		panic(err)
+	}
 }

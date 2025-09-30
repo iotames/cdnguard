@@ -23,8 +23,8 @@ func (d DB) AddBlockRequest(args ...any) (sql.Result, error) {
 // topIps: ip, request_count
 // created_at > CURRENT_DATE + INTERVAL '1 hours'
 // created_at < CURRENT_DATE + INTERVAL '5 hours'
-func (d DB) GetTopRequestIps(topIps any, startAt, endAt string) error {
-	return d.GetAllBySqlFile("get_top_request_ips.sql", &topIps, startAt, endAt)
+func (d DB) GetTopRequestIps(topIps any, startAt, endAt any) error {
+	return d.GetAllBySqlFile("get_top_request_ips.sql", topIps, startAt, endAt)
 }
 
 func (d DB) GetDbSizeText() (string, error) {
