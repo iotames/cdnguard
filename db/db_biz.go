@@ -9,8 +9,22 @@ func (d DB) CreateTables() (sql.Result, error) {
 	return d.ExecSqlFile("init_tables.sql")
 }
 
+// AddRequest 添加网络请求记录
 func (d DB) AddRequest(args ...any) (sql.Result, error) {
 	return d.ExecSqlFile("requests_insert.sql", args...)
+}
+
+// AddBlockRequest 添加被拦截的请求记录
+func (d DB) AddBlockRequest(args ...any) (sql.Result, error) {
+	return d.ExecSqlFile("block_requests_insert.sql", args...)
+}
+
+// GetTopRequestIps 获取指定时间范围内，请求数最高的IP列表
+// topIps: ip, request_count
+// created_at > CURRENT_DATE + INTERVAL '1 hours'
+// created_at < CURRENT_DATE + INTERVAL '5 hours'
+func (d DB) GetTopRequestIps(topIps any, startAt, endAt string) error {
+	return d.GetAllBySqlFile("get_top_request_ips.sql", &topIps, startAt, endAt)
 }
 
 func (d DB) GetDbSizeText() (string, error) {

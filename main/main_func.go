@@ -27,7 +27,7 @@ func dbinit() {
 	if err != nil {
 		panic(err)
 	}
-	log.Println("数据库初始化完成")
+	log.Println("数据库初始化完成", DbHost, DbPort, DbName)
 	// 调用GetDb方法，传入gdb。以便其他模块使用GetDb(nil)获取全局单例
 	db.GetDb(gdb)
 }

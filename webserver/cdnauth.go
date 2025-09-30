@@ -29,27 +29,26 @@ func cdnauth(ctx httpsvr.Context) {
 		Headers:       request_headers,
 		RawUrl:        ctx.Request.URL.String(),
 	}
-	// TODO 请求头没有accept-language可能是爬虫
 
 	// IP白名单PASS
-	okips, _ := GetDB().GetIpWhiteList()
+	okips := GetIpWhiteList()
 	if slices.Contains(okips, areq.Ip) {
-		AddRequest(areq)
 		success(ctx)
+		log.Println("info:ip white list PASS:", areq.Ip)
+		AddRequest(areq, false)
 		return
 	}
 
 	// IP黑名单BLOCK
-	okips, _ = GetDB().GetIpBlackList()
-	if slices.Contains(okips, areq.Ip) {
+	blackips := GetIpBlackList()
+	if slices.Contains(blackips, areq.Ip) {
 		fail(ctx)
 		log.Println("error:ip blacklist Block:", areq.Ip)
-		// TODO 添加到block_requests
+		AddRequest(areq, true)
 		return
 	}
 
-	// 10分钟或者1小时，更新一次IP黑名单。go func(){}添加到黑名单
-	AddRequest(areq)
+	AddRequest(areq, false)
 	success(ctx)
 }
 
@@ -57,19 +56,26 @@ type CdnAuthRequest struct {
 	Id, Ip, XForwardedFor, UserAgent, Referer, RequestUrl, Headers, RawUrl string
 }
 
-func AddRequest(areq CdnAuthRequest) error {
+func AddRequest(areq CdnAuthRequest, block bool) error {
 	var err error
 	d := GetDB()
-	_, err = d.AddRequest(
-		areq.Id,
-		areq.Ip,
-		areq.XForwardedFor,
-		areq.UserAgent,
-		areq.Referer,
-		areq.RequestUrl,
-		areq.Headers,
-		areq.RawUrl,
-	)
+	var ua, referer any
+	if areq.UserAgent == "" {
+		ua = nil
+	} else {
+		ua = areq.UserAgent
+	}
+	if areq.Referer == "" {
+		referer = nil
+	} else {
+		referer = areq.Referer
+	}
+	insertvals := []any{areq.Id, areq.Ip, areq.XForwardedFor, ua, referer, areq.RequestUrl, areq.Headers, areq.RawUrl}
+	if block {
+		_, err = d.AddBlockRequest(insertvals...)
+	} else {
+		_, err = d.AddRequest(insertvals...)
+	}
 	if err != nil {
 		log.Println("error: AddRequest sqlresult Fail:", err)
 	}
