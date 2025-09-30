@@ -16,7 +16,7 @@ const DEFALUT_SQL_DIR = "sql"
 var gdb *db.DB
 var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
-var DbPort, WebPort int
+var DbPort, WebPort, RequestLimit int
 var Debug, Prune, AddBlackIps bool
 
 func dbinit() {
@@ -49,6 +49,7 @@ func parseConf() {
 	cf.StringVar(&DbName, "DB_NAME", "postgres", "数据库名称")
 	cf.IntVar(&DbPort, "DB_PORT", 5432, "数据库端口")
 	cf.IntVar(&WebPort, "WEB_PORT", 1212, "web服务端口")
+	cf.IntVar(&RequestLimit, "REQUEST_LIMIT", 1600, "单位时间内IP最大请求数限制", "可能是凌晨1-5点")
 	cf.StringVar(&SqlDir, "SQL_DIR", DEFALUT_SQL_DIR, "sql文件目录")
 	if err := cf.Parse(); err != nil {
 		log.Fatal(err)

@@ -12,7 +12,7 @@ func extCmdRun() bool {
 		return true
 	}
 	if AddBlackIps {
-		cdnguard.AddBlackIpList()
+		cdnguard.AddBlackIpList(RequestLimit)
 		return true
 	}
 	if Debug {
