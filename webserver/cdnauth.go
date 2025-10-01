@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/iotames/cdnguard/guard"
 	"github.com/iotames/cdnguard/model"
 	"github.com/iotames/easyserver/httpsvr"
 )
@@ -28,7 +29,7 @@ func cdnauth(ctx httpsvr.Context) {
 		Headers:       request_headers,
 		RawUrl:        ctx.Request.URL.String(),
 	}
-	err = GuardPass(hreq, func(pass bool) {
+	err = guard.GuardPass(hreq, func(pass bool) {
 		if pass {
 			success(ctx)
 		} else {
