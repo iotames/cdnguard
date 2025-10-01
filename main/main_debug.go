@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/iotames/cdnguard"
+	"github.com/iotames/cdnguard/model"
 )
 
 func debug() {
@@ -17,7 +17,7 @@ func debug() {
 		panic(err)
 	}
 	log.Printf("------debug---GetIpWhiteList(%v)---\n", list)
-	ips, err := cdnguard.GetTopRequestIpToday(1, 5)
+	ips, err := model.GetTopRequestIpToday(1, 5)
 	if err != nil {
 		panic(err)
 	}

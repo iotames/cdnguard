@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// DB结构体和方法，只给main,model调用
 type DB struct {
 	edb     *easydb.EasyDb
 	sqlDir  contract.ISqlDir
@@ -17,6 +18,7 @@ type DB struct {
 var once sync.Once
 var db *DB
 
+// DB结构体和方法，只给main,model调用
 func GetDb(oncedb *DB) *DB {
 	once.Do(func() {
 		db = oncedb
@@ -27,6 +29,7 @@ func GetDb(oncedb *DB) *DB {
 	return db
 }
 
+// DB结构体和方法，只给main,model调用
 func NewDb(driverName, dbHost, dbUser, dbPassword, dbName string, dbPort int) *DB {
 	var err error
 	cf := easydb.NewDsnConf(driverName, dbHost, dbUser, dbPassword, dbName, dbPort)

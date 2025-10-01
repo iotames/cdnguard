@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/iotames/cdnguard/db"
+	"github.com/iotames/cdnguard/model"
 	"github.com/iotames/easyserver/httpsvr"
 )
 
@@ -18,7 +18,7 @@ func cdnauth(ctx httpsvr.Context) {
 		request_headers = string(hdrb)
 	}
 
-	hreq := db.HttpRequest{
+	hreq := model.HttpRequest{
 		Id:            q.Get("clientrequestid"),
 		Ip:            q.Get("clientip"),
 		XForwardedFor: q.Get("clientxforwardedfor"),
