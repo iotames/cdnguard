@@ -16,8 +16,9 @@ const DEFALUT_SQL_DIR = "sql"
 var gdb *db.DB
 var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
+var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey string
 var DbPort, WebPort, RequestLimit int
-var Debug, Prune, AddBlackIps bool
+var Debug, Prune, AddBlackIps, SyncBucketFiles bool
 
 func dbinit() {
 	gdb = db.NewDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
@@ -51,6 +52,8 @@ func parseConf() {
 	cf.IntVar(&WebPort, "WEB_PORT", 1212, "web服务端口")
 	cf.IntVar(&RequestLimit, "REQUEST_LIMIT", 1600, "单位时间内IP最大请求数限制", "可能是凌晨1-5点")
 	cf.StringVar(&SqlDir, "SQL_DIR", DEFALUT_SQL_DIR, "sql文件目录")
+	cf.StringVar(&QiniuAccessKey, "QINIU_ACCESS_KEY", "", "七牛AccessKey")
+	cf.StringVar(&QiniuSecretKey, "QINIU_SECRET_KEY", "", "七牛SecretKey")
 	if err := cf.Parse(); err != nil {
 		log.Fatal(err)
 	}
@@ -60,6 +63,9 @@ func parseCmd() {
 	flag.BoolVar(&Debug, "debug", false, "debug mode")
 	flag.BoolVar(&Prune, "prune", false, "prune db")
 	flag.BoolVar(&AddBlackIps, "addblackips", false, "Add IP list to Black IP List")
+	flag.BoolVar(&SyncBucketFiles, "syncbucketfiles", false, "sync bucket files")
+	flag.StringVar(&CdnName, "cdnname", "qiniu", "cdn name")
+	flag.StringVar(&BucketName, "bucketname", "wildto", "bucket name")
 	flag.Parse()
 }
 

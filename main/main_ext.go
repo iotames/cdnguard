@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/iotames/cdnguard"
+	"github.com/iotames/cdnguard/cdnapi"
 )
 
 func extCmdRun() bool {
@@ -9,6 +10,11 @@ func extCmdRun() bool {
 		if err := gdb.Prune(); err != nil {
 			panic(err)
 		}
+		return true
+	}
+	if SyncBucketFiles {
+		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey)
+		capi.SyncFiles(BucketName)
 		return true
 	}
 	if AddBlackIps {
