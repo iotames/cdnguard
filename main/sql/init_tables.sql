@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_files (
 	file_key varchar(500) NULL,
 	file_size int8 NULL,
 	file_hash varchar(64) NULL,
+	md5 varchar(32) NULL,
 	mime_type varchar(128) NULL,
 	file_type SMALLINT NOT NULL DEFAULT 0,
 	upload_time timestamp NULL,
@@ -103,7 +104,7 @@ COMMENT ON COLUMN qiniu_cdnauth_files.file_type IS '资源的存储类型，0表
 COMMENT ON COLUMN qiniu_cdnauth_files.status IS '文件的存储状态：0启用，1禁用';
 COMMENT ON COLUMN qiniu_cdnauth_files.request_count IS '请求次数';
 -- 为file_hash字段添加唯一约束（此操作会自动创建唯一索引）
-CREATE UNIQUE INDEX IF NOT EXISTS "UQE_files_file_hash" ON qiniu_cdnauth_files USING btree (file_hash);
+-- CREATE UNIQUE INDEX IF NOT EXISTS "UQE_files_file_hash" ON qiniu_cdnauth_files USING btree (file_hash);
 
 -- 同步记录
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_sync_log (

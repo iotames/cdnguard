@@ -2,6 +2,7 @@ package qiniu
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"database/sql"
@@ -79,7 +80,8 @@ func (q QiniuCdn) SyncFiles(bucketName string) {
 	for {
 		entries, _, nextMarker, hashNext, err := bucketManager.ListFiles(bucketName, prefix, delimiter, marker, limit)
 		if err != nil {
-			fmt.Println("api request list error:", err)
+			errmsg := fmt.Sprintf("api request error:%v", err)
+			log.Println(errmsg)
 			break
 		}
 		result, err = model.BatchInsertQiniuFiles(bucketId, entries)
@@ -104,10 +106,6 @@ func (q QiniuCdn) SyncFiles(bucketName string) {
 			rowsaffected, _ := result.RowsAffected()
 			lastinsertid, _ := result.LastInsertId()
 			fmt.Println("AddSyncLog result:", rowsaffected, lastinsertid)
-		}
-		if sort > 10 {
-			fmt.Println("-----AsyncFiles End---sort > 10--", sort)
-			break
 		}
 		if hashNext {
 			marker = nextMarker
