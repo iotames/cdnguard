@@ -64,8 +64,10 @@ func (q QiniuCdn) SyncFiles(bucketName string) {
 		fmt.Println("GetLastSyncLog error,", err)
 		return
 	}
-	// TODO 修改数据表中has_next字段值为true，然后再允许继续同步。
 	if !hasNext && id > 0 {
+		// TODO 修改数据表中has_next字段值为true，修改cursor_marker字段为最后一条数据file_key的规则Base64值，然后再继续同步。
+		// CursorMarker 为每次请求返回的最后一条数据，既定规则下的Base64 编码：
+		// base64Encode(fmt.Sprintf(`{"c":0,"k":"%s"}`, "file_key"))
 		fmt.Println("-----AsyncFiles End-----")
 		return
 	}
