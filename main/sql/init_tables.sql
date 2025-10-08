@@ -105,6 +105,7 @@ COMMENT ON COLUMN qiniu_cdnauth_files.status IS '文件的存储状态：0启用
 COMMENT ON COLUMN qiniu_cdnauth_files.request_count IS '请求次数';
 -- 为file_hash字段添加唯一约束（此操作会自动创建唯一索引）
 -- CREATE UNIQUE INDEX IF NOT EXISTS "UQE_files_file_hash" ON qiniu_cdnauth_files USING btree (file_hash);
+CREATE INDEX IF NOT EXISTS "IDX_files_file_key" ON qiniu_cdnauth_files (file_key);
 
 -- 同步记录
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_sync_log (

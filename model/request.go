@@ -1,5 +1,10 @@
 package model
 
+import (
+	"net/url"
+	"strings"
+)
+
 // 拦截请求类别为：IP黑名单拦截
 const BLOCK_TYPE_BLACK = 0
 
@@ -40,6 +45,13 @@ func addRequest(areq HttpRequest, block bool, block_type int) error {
 		_, err = d.AddBlockRequest(insertvals...)
 	} else {
 		_, err = d.AddRequest(insertvals...)
+		// 给文件列表添加请求次数统计
+		u, errParse := url.Parse(areq.RequestUrl)
+		var file_key string
+		if errParse == nil {
+			file_key = strings.TrimPrefix(u.Path, "/")
+			getDB().Exec("UPDATE qiniu_cdnauth_files SET request_count = request_count + 1 WHERE file_key = $1", file_key)
+		}
 	}
 	return err
 }
