@@ -51,6 +51,7 @@ func addRequest(areq HttpRequest, block bool, block_type int) error {
 		if errParse == nil {
 			file_key = strings.TrimPrefix(u.Path, "/")
 			getDB().Exec("UPDATE qiniu_cdnauth_files SET request_count = request_count + 1 WHERE file_key = $1", file_key)
+			// getDB().Exec("UPDATE qiniu_cdnauth_files SET request_count = request_count + 1, updated_at = ? WHERE file_key = $1", file_key, time.Now())
 		}
 	}
 	return err

@@ -17,6 +17,20 @@ go build -o main main.go
 go build -o main.exe main.go
 ```
 
+## 配置文件
+
+在项目的 `main` 目录，会生成 `.env` 配置文件，每个配置项均带注释说明。
+
+```conf
+# 七牛云的AccessKey，SecretKey
+QINIU_ACCESS_KEY="xxxxxxxxxxx"
+QINIU_SECRET_KEY="xxxxxxxxxxx"
+
+# 可用的空间名列表。逗号分隔。固定好顺序不要变，有需要可往后添加。因为数据表存储的bucket_id和顺序有关。
+BUCKET_NAME_LIST="wildto,wildto-private"
+```
+
+
 ## 常用命令
 
 进入 `main` 文件夹，然后执行 `./main`(Linux) 或 `main.exe`(Windows) 命令:
@@ -49,31 +63,21 @@ go build -o main.exe main.go
 ### 同步Bucket空间的文件
 
 ```bash
-# cdnname参数默认为qiniu
-# bucketname参数默认为wildto，可省略不填。
+# 同步Bucket空间文件
 ./main --syncbucketfiles --bucketname=wildto --cdnname=qiniu
 
+# cdnname为CDN服务商名称。可省略。默认为：qiniu
+# bucketname为空间名称。可省略。默认为：wildto。
 ./main --syncbucketfiles
-```
 
-七牛云的AccessKey，SecretKey 在 `.env` 文件中配置。
-
-```
-QINIU_ACCESS_KEY="xxxxxxxxxxx"
-QINIU_SECRET_KEY="xxxxxxxxxxx"
-```
-
-同步其他空间的文件：
-
-```bash
-# 同步Bucket空间文件
-# bucketname为空间名称。不添加参数，默认为：wildto。可用值为: wildto, wildto-private, buerdiy, buerdiy-staging, santic-pan, sagriatech-private, santic, newwildto
+# 更换Bucket空间
 ./main --syncbucketfiles --bucketname=wildto-private
-./main --syncbucketfiles --bucketname=buerdiy
 
 # 放到后台运行
 nohup ./main --syncbucketfiles > syncfiles.log 2>&1 &
 ```
+
+注：如果 `--bucketname` 指定的值不在 `.env` 文件的 `BUCKET_NAME_LIST` 中，会提示错误。
 
 ## Systemd系统服务
 

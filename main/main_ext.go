@@ -13,7 +13,7 @@ func extCmdRun() bool {
 		return true
 	}
 	if SyncBucketFiles {
-		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey)
+		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey, BucketNameList)
 		capi.SyncFiles(BucketName)
 		return true
 	}

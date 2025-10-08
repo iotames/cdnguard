@@ -19,6 +19,7 @@ var DbDriverName, DbHost, DbUser, DbPassword, DbName string
 var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey string
 var DbPort, WebPort, RequestLimit int
 var Debug, Prune, AddBlackIps, SyncBucketFiles bool
+var BucketNameList []string
 
 func dbinit() {
 	gdb = db.NewDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
@@ -54,6 +55,7 @@ func parseConf() {
 	cf.StringVar(&SqlDir, "SQL_DIR", DEFALUT_SQL_DIR, "sql文件目录")
 	cf.StringVar(&QiniuAccessKey, "QINIU_ACCESS_KEY", "", "七牛AccessKey")
 	cf.StringVar(&QiniuSecretKey, "QINIU_SECRET_KEY", "", "七牛SecretKey")
+	cf.StringListVar(&BucketNameList, "BUCKET_NAME_LIST", []string{"wildto"}, "可用的空间名列表。逗号分隔。固定好顺序不要变，有需要可往后添加。因为数据表存储的bucket_id和顺序有关。")
 	if err := cf.Parse(); err != nil {
 		log.Fatal(err)
 	}
