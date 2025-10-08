@@ -12,9 +12,17 @@ import (
 	"github.com/qiniu/go-sdk/v7/storage"
 )
 
+// # bucketname为空间名称。不添加参数，默认为：wildto。可用值为: wildto, wildto-private, buerdiy, buerdiy-staging, santic-pan, sagriatech-private, santic, newwildto
+
 // '空间名：0wildto，1wildto-private';
 const BUCKET_WILDTO = 0
 const BUCKET_WILDTO_PRIVATE = 1
+const BUCKET_BUERDIY = 2
+const BUCKET_BUERDIY_STAGING = 3
+const BUCKET_SANTIC_PAN = 4
+const BUCKET_SAGRIATECH_PRIVATE = 5
+const BUCKET_SANTIC = 6
+const BUCKET_NEWWILDTO = 7
 
 func GetBucketId(bucketName string) int {
 	switch bucketName {
@@ -22,6 +30,20 @@ func GetBucketId(bucketName string) int {
 		return BUCKET_WILDTO
 	case "wildto-private":
 		return BUCKET_WILDTO_PRIVATE
+	case "buerdiy":
+		return BUCKET_BUERDIY
+	case "buerdiy-staging":
+		return BUCKET_BUERDIY_STAGING
+	case "santic-pan":
+		return BUCKET_SANTIC_PAN
+	case "sagriatech-private":
+		return BUCKET_SAGRIATECH_PRIVATE
+	case "santic":
+		return BUCKET_SANTIC
+	case "newwildto":
+		return BUCKET_NEWWILDTO
+	default:
+		return -1
 	}
 	return -1
 }

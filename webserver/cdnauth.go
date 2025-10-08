@@ -29,14 +29,15 @@ func cdnauth(ctx httpsvr.Context) {
 		Headers:       request_headers,
 		RawUrl:        ctx.Request.URL.String(),
 	}
-	err = guard.GuardPass(hreq, func(pass bool) {
+	guard.GuardPass(hreq, func(pass bool) {
 		if pass {
 			success(ctx)
 		} else {
 			fail(ctx)
 		}
+	}, func(err error) {
+		if err != nil {
+			log.Printf("----error--cdnauth--GuardPass--SaveRequestError(%v)---", err)
+		}
 	})
-	if err != nil {
-		log.Printf("----error--cdnauth--GuardPass--SaveRequestError(%v)---", err)
-	}
 }
