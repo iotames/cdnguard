@@ -16,10 +16,16 @@ func AddSyncLog(bucketId int, hasNext bool, cursorMarker string, sizeLen, sort i
 }
 
 // 获取最近一条FileSyncLog同步记录
-func GetLastSyncLog(bucketId int, hasNext *bool, CursorMarker *string, id *int) error {
-	sql := `SELECT has_next, cursor_marker, id FROM qiniu_cdnauth_file_sync_log WHERE bucket_id = $1 ORDER BY id DESC LIMIT 1`
-	return getDB().GetOne(sql, []any{hasNext, CursorMarker, id}, bucketId)
+func GetLastSyncLog(bucketId int, hasNext *bool, CursorMarker *string, sizeLen, id *int) error {
+	sql := `SELECT has_next, cursor_marker, size_len, id FROM qiniu_cdnauth_file_sync_log WHERE bucket_id = $1 ORDER BY id DESC LIMIT 1`
+	return getDB().GetOne(sql, []any{hasNext, CursorMarker, sizeLen, id}, bucketId)
 }
+
+// // 更新同步日志状态
+// func UpdateSyncLogStatus(id int, hasNext bool) (result sql.Result, err error) {
+// 	sql := `UPDATE qiniu_cdnauth_file_sync_log SET has_next=$1, updated_at=CURRENT_TIMESTAMP WHERE id=$3`
+// 	return getDB().Exec(sql, hasNext, id)
+// }
 
 func BatchInsertQiniuFiles(bucketId int, files []storage.ListItem) (result sql.Result, err error) {
 	sql := `INSERT INTO qiniu_cdnauth_files (file_key, file_size, file_hash, md5, mime_type, file_type, upload_time, bucket_id, status, request_count, data_raw) VALUES %s`

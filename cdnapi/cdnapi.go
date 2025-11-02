@@ -1,7 +1,9 @@
 package cdnapi
 
 import (
-	"github.com/iotames/cdnguard/cdnapi/qiniu"
+	"log"
+
+	"github.com/iotames/cdnguard/cdnapi/internal/qiniu"
 )
 
 type CdnApi struct {
@@ -16,8 +18,13 @@ func NewCdnApi(cdnName string, key, secret string, buckets []string) *CdnApi {
 }
 
 func (c CdnApi) SyncFiles(bucketName string) {
+	var err error
 	if c.cdnName == "qiniu" {
 		qiniu := qiniu.NewQiniuCdn(c.key, c.secret, c.bucketNameList)
-		qiniu.SyncFiles(bucketName)
+		err = qiniu.SyncFilesInfo(bucketName)
 	}
+	if err != nil {
+		panic(err)
+	}
+	log.Println("-----SyncFilesInfo End-----")
 }
