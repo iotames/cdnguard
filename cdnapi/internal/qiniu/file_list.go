@@ -2,6 +2,7 @@ package qiniu
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"log"
 
@@ -153,4 +154,25 @@ func (q QiniuCdn) saveFilesToDb(bucketId int, lastMarker string, hashNext bool, 
 	}
 	*sort++
 	return
+}
+
+func (q QiniuCdn) ShowFilesInfo(bucketName, lastCursor string, limit int) error {
+	if limit == 0 {
+		limit = 1000
+	}
+	bucketManager := storage.NewBucketManager(q.auth, &q.conf)
+	entries, _, nextMarker, hasNext, err := bucketManager.ListFiles(bucketName, "", "", lastCursor, limit)
+	if err != nil {
+		return fmt.Errorf("api request error:%v", err)
+	}
+	log.Println("ShowFilesInfo--hashNext:", hasNext)
+	for i, entry := range entries {
+		base64Src := fmt.Sprintf(`{"c":0,"k":"%s"}`, entry.Key)
+		fcursor := base64.StdEncoding.EncodeToString([]byte(base64Src))
+		log.Printf("ShowFilesInfo--entry-i[%d]-key(%s)-size(%d)-hash(%s)-cursor(%s)\n", i, entry.Key, entry.Fsize, entry.Hash, fcursor)
+		// log.Println("", entry.Key, "file cursor:", fcursor)
+	}
+	log.Println("ShowFilesInfo--nextMarker:", nextMarker)
+	log.Println("ShowFilesInfo--hashNext:", hasNext)
+	return nil
 }

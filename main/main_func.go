@@ -17,8 +17,9 @@ var gdb *db.DB
 var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
 var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey string
+var LastCursorMarker string
 var DbPort, WebPort, RequestLimit int
-var Debug, Prune, AddBlackIps, SyncBucketFiles bool
+var Debug, Prune, AddBlackIps, SyncBucketFiles, ShowBucketFiles bool
 var BucketNameList []string
 
 func dbinit() {
@@ -66,8 +67,10 @@ func parseCmd() {
 	flag.BoolVar(&Prune, "prune", false, "prune db")
 	flag.BoolVar(&AddBlackIps, "addblackips", false, "Add IP list to Black IP List")
 	flag.BoolVar(&SyncBucketFiles, "syncbucketfiles", false, "sync bucket files")
+	flag.BoolVar(&ShowBucketFiles, "showbucketfiles", false, "show bucket files")
 	flag.StringVar(&CdnName, "cdnname", "qiniu", "cdn name")
 	flag.StringVar(&BucketName, "bucketname", "", "bucket name")
+	flag.StringVar(&LastCursorMarker, "lastcursor", "", "上一次列表的最后一条数据标记")
 	flag.Parse()
 }
 

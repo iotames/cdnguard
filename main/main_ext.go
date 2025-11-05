@@ -20,6 +20,14 @@ func extCmdRun() bool {
 		}
 		return true
 	}
+	if ShowBucketFiles {
+		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey, BucketNameList)
+		err := capi.ShowFilesInfo(BucketName, LastCursorMarker)
+		if err != nil {
+			panic(err)
+		}
+		return true
+	}
 	if AddBlackIps {
 		cdnguard.AddBlackIpList(RequestLimit)
 		return true
