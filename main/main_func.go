@@ -67,7 +67,7 @@ func parseCmd() {
 	flag.BoolVar(&AddBlackIps, "addblackips", false, "Add IP list to Black IP List")
 	flag.BoolVar(&SyncBucketFiles, "syncbucketfiles", false, "sync bucket files")
 	flag.StringVar(&CdnName, "cdnname", "qiniu", "cdn name")
-	flag.StringVar(&BucketName, "bucketname", "wildto", "bucket name")
+	flag.StringVar(&BucketName, "bucketname", "", "bucket name")
 	flag.Parse()
 }
 

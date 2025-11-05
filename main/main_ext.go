@@ -14,7 +14,10 @@ func extCmdRun() bool {
 	}
 	if SyncBucketFiles {
 		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey, BucketNameList)
-		capi.SyncFiles(BucketName)
+		err := capi.SyncFilesInfo(BucketName)
+		if err != nil {
+			panic(err)
+		}
 		return true
 	}
 	if AddBlackIps {

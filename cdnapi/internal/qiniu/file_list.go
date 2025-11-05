@@ -14,16 +14,9 @@ var result sql.Result
 // var hashNext bool
 
 // SyncFilesInfo 同步某个存储空间下的文件列表信息到数据表中
-func (q QiniuCdn) SyncFilesInfo(bucketName string) error {
-
+func (q QiniuCdn) SyncFilesInfo(bucketName string, bucketId int) error {
 	var err error
-	bucketId := -1
-	for i, bname := range q.buckets {
-		if bname == bucketName {
-			bucketId = i
-			break
-		}
-	}
+
 	if bucketId == -1 {
 		return fmt.Errorf("bucketName(%s) not in BUCKET_NAME_LIST. Please look the file: .env", bucketName)
 	}
@@ -58,7 +51,8 @@ func (q QiniuCdn) SyncFilesInfo(bucketName string) error {
 			var entries []storage.ListItem
 			// 通过API网络请求接口，查看文件列表数据
 			entries, _, nextMarker, hasNext, err = bucketManager.ListFiles(bucketName, prefix, delimiter, lastMarker, limit)
-			// CursorMarker 为每次请求返回的最后一条数据，既定规则下的Base64 编码：base64Encode(fmt.Sprintf(`{"c":0,"k":"%s"}`, "file_key"))
+			// CursorMarker 为每次请求返回的最后一条数据，【既定规则下的Base64 编码】：base64Encode(fmt.Sprintf(`{"c":0,"k":"%s"}`, "file_key"))
+			// TODO 校验七牛云在指定bucket文件列表中，同步的最后一个文件在【既定规则下的Base64 编码】，是否与同步日志的buket_file_sync_log表中的cursor_marker一致。
 			if err != nil {
 				// API网络请求获取新文件列表数据失败
 				return fmt.Errorf("last file_sync_log get new ListFiles error: %v", err)
@@ -123,6 +117,7 @@ func (q QiniuCdn) syncFilesBatch(bucketManager *storage.BucketManager, bucketId 
 func (q QiniuCdn) syncByApi(bucketManager *storage.BucketManager, bucketId int, bucketName, prefix, delimiter, marker string, limit int, sort *int) (nextMarker string, hashNext bool, err error) {
 	// 从起始标记位获取文件列表
 	var entries []storage.ListItem
+	// TODO 如果按同步时间逆序，可能后面新增的文件会无法继续同步。
 	entries, _, nextMarker, hashNext, err = bucketManager.ListFiles(bucketName, prefix, delimiter, marker, limit)
 	if err != nil {
 		err = fmt.Errorf("api request error:%v", err)

@@ -67,8 +67,8 @@ BUCKET_NAME_LIST="wildto,wildto-private"
 ./main --syncbucketfiles --bucketname=wildto --cdnname=qiniu
 
 # cdnname为CDN服务商名称。可省略。默认为：qiniu
-# bucketname为空间名称。可省略。默认为：wildto。
-./main --syncbucketfiles
+# bucketname为空间名称。必填。不可省略。
+./main --syncbucketfiles --cdnname=qiniu
 
 # 更换Bucket空间
 ./main --syncbucketfiles --bucketname=wildto-private
