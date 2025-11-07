@@ -1,7 +1,7 @@
 package db
 
 import (
-	"log"
+	"database/sql"
 	"sync"
 	"time"
 
@@ -58,17 +58,10 @@ func (d *DB) SetSqlDir(sqldir contract.ISqlDir) {
 	d.sqlDir = sqldir
 }
 
-func (d *DB) Stats() {
+func (d *DB) Stats() sql.DBStats {
 	// 获取连接统计信息
 	dbb := d.edb.GetSqlDB()
-	stats := dbb.Stats()
-	log.Printf("数据库连接统计:\n")
-	log.Printf("最大打开连接数: %d\n", stats.MaxOpenConnections)
-	log.Printf("打开连接数: %d\n", stats.OpenConnections)
-	log.Printf("使用中连接数: %d\n", stats.InUse)
-	log.Printf("空闲连接数: %d\n", stats.Idle)
-	log.Printf("等待新连接的数量: %d\n", stats.WaitCount)
-	log.Printf("因超时关闭的连接数: %d\n", stats.MaxLifetimeClosed)
+	return dbb.Stats()
 }
 
 func (d DB) CloseDb() error {

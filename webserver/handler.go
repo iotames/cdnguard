@@ -7,8 +7,9 @@ import (
 	"github.com/iotames/easyserver/response"
 )
 
-var router = map[string]func(ctx httpsvr.Context){
-	"/cdnauth": cdnauth,
+func setRouter(s *httpsvr.EasyServer) {
+	s.AddHandler("GET", "/cdnauth", cdnauth)
+	s.AddHandler("GET", "/api/local/dbstats", dbstats)
 }
 
 func success(ctx httpsvr.Context) {

@@ -8,11 +8,10 @@ import (
 	"github.com/iotames/cdnguard/cdnapi"
 )
 
+// extCmdRun 运行扩展命令. 默认返回值true，表示命令执行结束。
 func extCmdRun() bool {
-	// TODO gdb.Stats() 的调用应该放在WebServer的API接口中，才是所要获取的连接池的实际信息
 	if DbStats {
-		gdb.Stats()
-		return true
+		return showDbStats()
 	}
 	if StatisEveryDay {
 		// 记录开始时间

@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"log"
+	"reflect"
 )
 
 var result sql.Result
@@ -24,3 +25,31 @@ func StatisRequestEveryDay() (rownum int64, err error) {
 	log.Printf("-----model.StatisRequestEveryDay---RowsAffected(%d)---\n", rownum)
 	return
 }
+
+func DbStats() map[string]interface{} {
+	d := getDB()
+	stats := d.Stats()
+	// 使用反射将 sql.DBStats 结构体中的字段转换为 map[string]interface{}
+	result := make(map[string]interface{})
+	// 获取 stats 的反射值
+	v := reflect.ValueOf(stats)
+	t := reflect.TypeOf(stats)
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		valuue := v.Field(i).Interface()
+		result[field.Name] = valuue
+	}
+	return result
+}
+
+// stats := DBStats{
+// 	MaxOpenConnections: db.maxOpen,
+// 	Idle:            len(db.freeConn),
+// 	OpenConnections: db.numOpen,
+// 	InUse:           db.numOpen - len(db.freeConn),
+// 	WaitCount:         db.waitCount,
+// 	WaitDuration:      time.Duration(wait),
+// 	MaxIdleClosed:     db.maxIdleClosed,
+// 	MaxIdleTimeClosed: db.maxIdleTimeClosed,
+// 	MaxLifetimeClosed: db.maxLifetimeClosed,
+// }
