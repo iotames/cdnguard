@@ -9,6 +9,11 @@ import (
 )
 
 func extCmdRun() bool {
+	// TODO gdb.Stats() 的调用应该放在WebServer的API接口中，才是所要获取的连接池的实际信息
+	if DbStats {
+		gdb.Stats()
+		return true
+	}
 	if StatisEveryDay {
 		// 记录开始时间
 		startTime := time.Now()

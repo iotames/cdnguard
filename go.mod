@@ -4,7 +4,7 @@ go 1.24.1
 
 require (
 	github.com/iotames/easyconf v1.1.3
-	github.com/iotames/easydb v0.3.0
+	github.com/iotames/easydb v0.4.0
 	github.com/iotames/easyserver v1.0.1
 	github.com/lib/pq v1.10.9
 	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.9
