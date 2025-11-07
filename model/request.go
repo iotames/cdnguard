@@ -23,7 +23,7 @@ type HttpRequest struct {
 
 // addRequest 添加网络请求记录
 // block: 是否阻断拦截请求。
-// block_type: 拦截阻断的理由类别。0=IP黑名单拦截，1=漏洞扫描拦截，2=网络爬虫
+// block_type: 拦截阻断的理由类别。0=IP黑名单拦截 1=漏洞扫描拦截 2=网络爬虫 3=异常的UserAgent
 func addRequest(areq HttpRequest, block bool, block_type int) error {
 	var err error
 	d := getDB()
@@ -63,7 +63,7 @@ func AddRequestPass(areq HttpRequest) error {
 }
 
 // AddRequestBlock 记录被拦截阻断的请求
-// block_type: 拦截阻断的理由类别。0=IP黑名单拦截，1=规则拦截，2=网络爬虫
+// block_type: 拦截阻断的理由类别。0=IP黑名单拦截 1=漏洞扫描拦截 2=网络爬虫 3=异常的UserAgent
 func AddRequestBlock(areq HttpRequest, block_type int) error {
 	return addRequest(areq, true, block_type)
 }

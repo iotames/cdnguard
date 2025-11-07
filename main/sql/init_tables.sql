@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_block_requests (
 		created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 		updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
+COMMENT ON COLUMN qiniu_cdnauth_block_requests.block_type IS '拦截阻断的理由类别。0=IP黑名单拦截 1=漏洞扫描拦截 2=网络爬虫 3=异常的UserAgent';
 CREATE INDEX IF NOT EXISTS "IDX_client_ip_block_requests" ON qiniu_cdnauth_block_requests USING btree (client_ip);
 CREATE INDEX IF NOT EXISTS "IDX_block_requests_block_type" ON qiniu_cdnauth_block_requests USING btree (block_type);
 
@@ -119,3 +120,32 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_sync_log (
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 	updated_at timestamp DEFAULT CURRENT_TIMESTAMP	 
 );
+
+-- statis 数据统计
+CREATE TABLE IF NOT EXISTS qiniu_cdnauth_statis (
+	id SERIAL PRIMARY KEY,
+	bucket_id SMALLINT NOT NULL DEFAULT 0,
+	statis_date DATE NOT NULL DEFAULT CURRENT_DATE,
+	request_count int8 NOT NULL DEFAULT 0,
+	blocked_count int8 NOT NULL DEFAULT 0,
+	blocked_black_count int8 NOT NULL DEFAULT 0,
+	blocked_scanvul_count int8 NOT NULL DEFAULT 0,
+	blocked_webspider_count int8 NOT NULL DEFAULT 0,
+	blocked_useragent_count int8 NOT NULL DEFAULT 0,
+	request_size int8 NOT NULL DEFAULT 0,
+	blocked_size int8 NOT NULL DEFAULT 0,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+	updated_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON COLUMN qiniu_cdnauth_statis.bucket_id IS '存储空间ID';
+COMMENT ON COLUMN qiniu_cdnauth_statis.statis_date IS '统计日期';
+COMMENT ON COLUMN qiniu_cdnauth_statis.request_count IS '请求次数';
+COMMENT ON COLUMN qiniu_cdnauth_statis.blocked_count IS '拦截请求次数';
+COMMENT ON COLUMN qiniu_cdnauth_statis.blocked_black_count IS '黑名单拦截请求次数';
+COMMENT ON COLUMN qiniu_cdnauth_statis.blocked_scanvul_count IS '漏洞扫描拦截请求次数';
+COMMENT ON COLUMN qiniu_cdnauth_statis.blocked_webspider_count IS '网络爬虫拦截请求次数';
+COMMENT ON COLUMN qiniu_cdnauth_statis.blocked_useragent_count IS '异常用户代理拦截请求次数';
+COMMENT ON COLUMN qiniu_cdnauth_statis.request_size IS '请求消耗流量大小';
+COMMENT ON COLUMN qiniu_cdnauth_statis.blocked_size IS '拦截流量大小';
+CREATE INDEX IF NOT EXISTS "IDX_statis_bucket_id" ON qiniu_cdnauth_statis (bucket_id);
+CREATE INDEX IF NOT EXISTS "IDX_statis_statis_date" ON qiniu_cdnauth_statis (statis_date);

@@ -25,3 +25,9 @@ func AddBlackIpList(requestLimit int) error {
 	// TODO 请求头没有accept-language可能是爬虫
 	return nil
 }
+
+// StatisEveryDay 统计每天网络请求
+func StatisEveryDay() (rownum int64, err error) {
+	// 多表查询，每天统计分析网络请求，记录结果到数据表：qiniu_cdnauth_statis
+	return model.StatisRequestEveryDay()
+}

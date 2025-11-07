@@ -19,7 +19,7 @@ var DbDriverName, DbHost, DbUser, DbPassword, DbName string
 var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey string
 var LastCursorMarker string
 var DbPort, WebPort, RequestLimit int
-var Debug, Prune, AddBlackIps, SyncBucketFiles, ShowBucketFiles bool
+var Debug, Prune, AddBlackIps, SyncBucketFiles, ShowBucketFiles, StatisEveryDay bool
 var BucketNameList []string
 
 func dbinit() {
@@ -68,6 +68,7 @@ func parseCmd() {
 	flag.BoolVar(&AddBlackIps, "addblackips", false, "Add IP list to Black IP List")
 	flag.BoolVar(&SyncBucketFiles, "syncbucketfiles", false, "sync bucket files")
 	flag.BoolVar(&ShowBucketFiles, "showbucketfiles", false, "show bucket files")
+	flag.BoolVar(&StatisEveryDay, "statiseveryday", false, "statis request data every day")
 	flag.StringVar(&CdnName, "cdnname", "qiniu", "cdn name")
 	flag.StringVar(&BucketName, "bucketname", "", "bucket name")
 	flag.StringVar(&LastCursorMarker, "lastcursor", "", "上一次列表的最后一条数据标记")

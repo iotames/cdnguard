@@ -1,11 +1,26 @@
 package main
 
 import (
+	"log"
+	"time"
+
 	"github.com/iotames/cdnguard"
 	"github.com/iotames/cdnguard/cdnapi"
 )
 
 func extCmdRun() bool {
+	if StatisEveryDay {
+		// 记录开始时间
+		startTime := time.Now()
+		log.Println("Begin Statis ......")
+		if rownum, err := cdnguard.StatisEveryDay(); err != nil {
+			panic(err)
+		} else {
+			costTime := time.Since(startTime) // 正确计算耗时
+			log.Println("Statis every day AffectedRowNum:", rownum, "costTime:", costTime)
+		}
+		return true
+	}
 	if Prune {
 		if err := gdb.Prune(); err != nil {
 			panic(err)
