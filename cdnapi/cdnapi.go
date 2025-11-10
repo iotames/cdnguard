@@ -43,7 +43,7 @@ func (c CdnApi) ShowFilesInfo(bucketName, lastCursor string) error {
 	var err error
 	if c.cdnName == "qiniu" {
 		qiniu := qiniu.NewQiniuCdn(c.key, c.secret, c.bucketNameList)
-		err = qiniu.ShowFilesInfo(bucketName, lastCursor, 1000)
+		err = qiniu.ShowBucketFilesInfo(bucketName, lastCursor, 1000)
 	}
 	if err != nil {
 		return err
