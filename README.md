@@ -27,7 +27,7 @@ QINIU_ACCESS_KEY="xxxxxxxxxxx"
 QINIU_SECRET_KEY="xxxxxxxxxxx"
 
 # 可用的空间名列表。逗号分隔。固定好顺序不要变，有需要可往后添加。因为数据表存储的bucket_id和顺序有关。
-BUCKET_NAME_LIST="wildto,wildto-private"
+BUCKET_NAME_LIST="bucket123,bucket456,bucket789"
 ```
 
 
@@ -64,14 +64,14 @@ BUCKET_NAME_LIST="wildto,wildto-private"
 
 ```bash
 # 同步Bucket空间文件
-./main --syncbucketfiles --bucketname=wildto --cdnname=qiniu
+./main --syncbucketfiles --bucketname=bucket123 --cdnname=qiniu
 
 # cdnname为CDN服务商名称。可省略。默认为：qiniu
 # bucketname为空间名称。必填。不可省略。
-./main --syncbucketfiles --bucketname=wildto
+./main --syncbucketfiles --bucketname=bucket123
 
 # 更换Bucket空间
-./main --syncbucketfiles --bucketname=wildto-private
+./main --syncbucketfiles --bucketname=bucket789
 
 # 放到后台运行
 nohup ./main --syncbucketfiles > syncfiles.log 2>&1 &

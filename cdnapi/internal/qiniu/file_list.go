@@ -203,7 +203,7 @@ func (bf QiniuBucketFile) ListFiles(bucketName, lastCursorMarker string) (entrie
 	}
 	if bf.debug {
 		for i, entry := range entries {
-			// {"c":0,"k":"黄红治.xlsx"}
+			// {"c":0,"k":"filename.xlsx"}
 			base64Src := fmt.Sprintf(`{"c":0,"k":"%s"}`, entry.Key)
 			fcursor := base64.StdEncoding.EncodeToString([]byte(base64Src))
 			log.Printf("QiniuBucketFile.ListFiles--entry-i[%d]-key(%s)-size(%d)-hash(%s)-cursor(%s)\n", i, entry.Key, entry.Fsize, entry.Hash, fcursor)

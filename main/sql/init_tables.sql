@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_files (
 	data_raw json NOT NULL
 );
 -- 添加字段注释
-COMMENT ON COLUMN qiniu_cdnauth_files.bucket_id IS '空间名：0wildto，1wildto-private';
+COMMENT ON COLUMN qiniu_cdnauth_files.bucket_id IS '空间名：0bucket123，1bucket567';
 COMMENT ON COLUMN qiniu_cdnauth_files.file_type IS '资源的存储类型，0表示标准存储，1 表示低频存储，2 表示归档存储，3 表示深度归档存储，4 表示归档直读存储，5 表示智能分层存储。';
 COMMENT ON COLUMN qiniu_cdnauth_files.status IS '文件的存储状态：0启用，1禁用';
 COMMENT ON COLUMN qiniu_cdnauth_files.request_count IS '请求次数';
