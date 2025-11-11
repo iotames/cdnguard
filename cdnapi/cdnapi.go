@@ -20,6 +20,7 @@ func NewCdnApi(cdnName string, key, secret string, buckets []string) *CdnApi {
 	return &CdnApi{cdnName, key, secret, buckets}
 }
 
+// SyncFilesInfo 同步文件列表信息
 func (c CdnApi) SyncFilesInfo(bucketName string) error {
 	var err error
 	var bucketId int
@@ -39,6 +40,7 @@ func (c CdnApi) SyncFilesInfo(bucketName string) error {
 	return nil
 }
 
+// ShowFilesInfo 显示文件列表信息。lastCursor表示从上一个文件的marker标记位之后开始显示。
 func (c CdnApi) ShowFilesInfo(bucketName, lastCursor string) error {
 	var err error
 	if c.cdnName == "qiniu" {

@@ -2,7 +2,7 @@ package qiniu
 
 import (
 	"database/sql"
-	"encoding/base64"
+
 	"fmt"
 	"log"
 	"log/slog"
@@ -16,6 +16,7 @@ var result sql.Result
 // var hasNext bool
 
 // SyncFilesInfo 同步某个存储空间下的文件列表信息到数据表中
+// 七牛云的文件列举接口本身不支持增量同步。连上传日期的筛选条件都不支持。
 func (q QiniuCdn) SyncFilesInfo(bucketName string, bucketId int) error {
 	var err error
 
@@ -53,7 +54,6 @@ func (q QiniuCdn) SyncFilesInfo(bucketName string, bucketId int) error {
 			var nextMarker string
 			var entries []storage.ListItem
 			// 通过API网络请求接口，查看文件列表数据
-			// entries, _, nextMarker, hasNext, err = bucketManager.ListFiles(bucketName, prefix, delimiter, lastMarker, limit)
 			qiniuBucketFile := NewQiniuBucketFile(bucketManager, false)
 			qiniuBucketFile.SetLimit(limit)
 			entries, _, nextMarker, hasNext, err = qiniuBucketFile.ListFiles(bucketName, lastMarker)
@@ -127,7 +127,6 @@ func (q QiniuCdn) syncByApi(bucketManager *storage.BucketManager, bucketId int, 
 	qiniuBucketFile := NewQiniuBucketFile(bucketManager, false)
 	qiniuBucketFile.SetLimit(limit)
 	entries, _, nextMarker, hasNext, err = qiniuBucketFile.ListFiles(bucketName, marker)
-	// entries, _, nextMarker, hasNext, err = bucketManager.ListFiles(bucketName, prefix, delimiter, marker, limit)
 	if err != nil {
 		return
 	}
@@ -166,50 +165,4 @@ func (q QiniuCdn) ShowBucketFilesInfo(bucketName, lastCursor string, limit int) 
 	qiniuBucketFile.SetLimit(limit)
 	_, _, _, _, err := qiniuBucketFile.ListFiles(bucketName, lastCursor)
 	return err
-}
-
-type QiniuBucketFile struct {
-	bucketManager     *storage.BucketManager
-	prefix, delimiter string
-	limit             int
-	debug             bool
-}
-
-func NewQiniuBucketFile(bucketManager *storage.BucketManager, debug bool) *QiniuBucketFile {
-	return &QiniuBucketFile{
-		bucketManager: bucketManager,
-		limit:         1000,
-		debug:         debug,
-	}
-}
-func (bf *QiniuBucketFile) SetPrefix(prefix string) {
-	bf.prefix = prefix
-}
-func (bf *QiniuBucketFile) SetDelimiter(delimiter string) {
-	bf.delimiter = delimiter
-}
-
-func (bf *QiniuBucketFile) SetLimit(limit int) {
-	bf.limit = limit
-}
-
-func (bf QiniuBucketFile) ListFiles(bucketName, lastCursorMarker string) (entries []storage.ListItem, commonPrefixes []string, nextMarker string, hasNext bool, err error) {
-	bucketManager := bf.bucketManager
-	slog.Info("QiniuBucketFile.ListFiles Begin:", "bucketName", bucketName, "prefix", bf.prefix, "delimiter", bf.delimiter, "limit", bf.limit, "lastCursorMarker", lastCursorMarker)
-	entries, commonPrefixes, nextMarker, hasNext, err = bucketManager.ListFiles(bucketName, bf.prefix, bf.delimiter, lastCursorMarker, bf.limit)
-	if err != nil {
-		err = fmt.Errorf("api request error:%v", err)
-		return
-	}
-	if bf.debug {
-		for i, entry := range entries {
-			// {"c":0,"k":"filename.xlsx"}
-			base64Src := fmt.Sprintf(`{"c":0,"k":"%s"}`, entry.Key)
-			fcursor := base64.StdEncoding.EncodeToString([]byte(base64Src))
-			log.Printf("QiniuBucketFile.ListFiles--entry-i[%d]-key(%s)-size(%d)-hash(%s)-cursor(%s)\n", i, entry.Key, entry.Fsize, entry.Hash, fcursor)
-			// log.Println("", entry.Key, "file cursor:", fcursor)
-		}
-	}
-	slog.Info("QiniuBucketFile.ListFiles End:", "nextMarker", nextMarker, "nextMarkerLen", len(nextMarker), "hasNext", hasNext)
-	return
 }
