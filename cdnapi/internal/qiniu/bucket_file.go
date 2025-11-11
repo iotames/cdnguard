@@ -56,3 +56,13 @@ func (bf QiniuBucketFile) ListFiles(bucketName, lastCursorMarker string) (entrie
 	slog.Info("QiniuBucketFile.ListFiles End:", "nextMarker", nextMarker, "nextMarkerLen", len(nextMarker), "hasNext", hasNext)
 	return
 }
+
+func (bf QiniuBucketFile) Copy(srcBucket, srcKey, destBucket, destKey string) error {
+	// TODO 数据库里添加操作日志
+	return bf.bucketManager.Copy(srcBucket, srcKey, destBucket, destKey, false)
+}
+
+func (bf QiniuBucketFile) Move(srcBucket, srcKey, destBucket, destKey string) error {
+	// TODO 数据库里添加操作日志
+	return bf.bucketManager.Move(srcBucket, srcKey, destBucket, destKey, false)
+}

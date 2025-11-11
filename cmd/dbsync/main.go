@@ -84,7 +84,6 @@ func main() {
 			sqlargs = append(sqlargs, row, len(row))
 			sqlvalues = append(sqlvalues, fmt.Sprintf("($%d,$%d)", sqli, sqli+1))
 			sqli += 2
-			// TODO
 		}
 		fmt.Println("最后处理行数", i)
 

@@ -16,7 +16,7 @@ var result sql.Result
 // var hasNext bool
 
 // SyncFilesInfo 同步某个存储空间下的文件列表信息到数据表中
-// 七牛云的文件列举接口本身不支持增量同步。连上传日期的筛选条件都不支持。
+// TODO 七牛云的文件列举接口本身不支持增量同步。连上传日期的筛选条件都不支持。
 func (q QiniuCdn) SyncFilesInfo(bucketName string, bucketId int) error {
 	var err error
 

@@ -7,6 +7,7 @@ import (
 	"github.com/iotames/cdnguard"
 	"github.com/iotames/cdnguard/db"
 	cdnsql "github.com/iotames/cdnguard/main/sql"
+	"github.com/iotames/cdnguard/migrate"
 	"github.com/iotames/cdnguard/webserver"
 	"github.com/iotames/easyconf"
 )
@@ -21,6 +22,7 @@ var LastCursorMarker string
 var DbPort, WebPort, RequestLimit int
 var Debug, Prune, AddBlackIps, SyncBucketFiles, ShowBucketFiles, StatisEveryDay, DbStats bool
 var BucketNameList []string
+var migrateFromHost, migrateToHost, migrateReferer, fromBucket, toBucket string
 
 func dbinit() {
 	gdb = db.NewDb(DbDriverName, DbHost, DbUser, DbPassword, DbName, DbPort)
@@ -38,6 +40,7 @@ func dbinit() {
 func runserver() {
 	var err error
 	s := webserver.NewWebServer(WebPort)
+	s.AddMiddleHead(migrate.NewFileMigrate(migrateFromHost, migrateToHost, migrateReferer, fromBucket, toBucket))
 	if err = s.ListenAndServe(); err != nil {
 		panic(err)
 	}
@@ -57,6 +60,11 @@ func parseConf() {
 	cf.StringVar(&QiniuAccessKey, "QINIU_ACCESS_KEY", "", "七牛AccessKey")
 	cf.StringVar(&QiniuSecretKey, "QINIU_SECRET_KEY", "", "七牛SecretKey")
 	cf.StringListVar(&BucketNameList, "BUCKET_NAME_LIST", []string{"bucket123"}, "可用的空间名列表。逗号分隔。固定好顺序不要变，有需要可往后添加。因为数据表存储的bucket_id和顺序有关。")
+	cf.StringVar(&migrateFromHost, "MIGRATE_FROM_HOST", "", "迁移源主机")
+	cf.StringVar(&migrateToHost, "MIGRATE_TO_HOST", "", "迁移目标主机")
+	cf.StringVar(&migrateReferer, "MIGRATE_REFERER", "", "通过Referer迁移")
+	cf.StringVar(&fromBucket, "MIGRATE_FROM_BUCKET", "", "迁移源空间")
+	cf.StringVar(&toBucket, "MIGRATE_TO_BUCKET", "", "迁移目标空间")
 	if err := cf.Parse(); err != nil {
 		log.Fatal(err)
 	}
