@@ -3,11 +3,11 @@ module github.com/iotames/cdnguard
 go 1.24.1
 
 require (
-	github.com/iotames/easyconf v1.1.3
+	github.com/iotames/easyconf v1.2.1
 	github.com/iotames/easydb v0.4.0
 	github.com/iotames/easyserver v1.2.0
 	github.com/lib/pq v1.10.9
-	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.9
+	github.com/oschwald/maxminddb-golang/v2 v2.1.0
 	github.com/qiniu/go-sdk/v7 v7.25.4
 )
 
@@ -19,7 +19,7 @@ require (
 	github.com/iotames/miniutils v1.0.11 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	modernc.org/fileutil v1.0.0 // indirect
 )

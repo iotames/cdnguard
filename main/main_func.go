@@ -65,7 +65,7 @@ func parseConf() {
 	cf.StringVar(&migrateReferer, "MIGRATE_REFERER", "", "通过Referer迁移")
 	cf.StringVar(&fromBucket, "MIGRATE_FROM_BUCKET", "", "迁移源空间")
 	cf.StringVar(&toBucket, "MIGRATE_TO_BUCKET", "", "迁移目标空间")
-	if err := cf.Parse(); err != nil {
+	if err := cf.Parse(false); err != nil {
 		log.Fatal(err)
 	}
 }
