@@ -149,3 +149,49 @@ COMMENT ON COLUMN qiniu_cdnauth_statis.request_size IS '请求消耗流量大小
 COMMENT ON COLUMN qiniu_cdnauth_statis.blocked_size IS '拦截流量大小';
 CREATE INDEX IF NOT EXISTS "IDX_statis_bucket_id" ON qiniu_cdnauth_statis (bucket_id);
 CREATE INDEX IF NOT EXISTS "IDX_statis_statis_date" ON qiniu_cdnauth_statis (statis_date);
+
+
+-- 要迁移的文件列表
+CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_migrate_list (
+    id SERIAL PRIMARY KEY,
+    file_url varchar(1000) NOT NULL,
+	status SMALLINT NOT NULL DEFAULT 0,
+    from_table VARCHAR(64) NOT NULL,
+    from_column VARCHAR(64) NOT NULL,
+    file_key VARCHAR(500) NOT NULL,
+	from_bucket VARCHAR(32),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at timestamp DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "IDX_file_migrate_list_file_key" ON qiniu_cdnauth_file_migrate_list (file_key);
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.file_url IS '文件原始URL';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.status IS '迁移状态：0未开始，1copy成功，2move成功，3原文件已删除';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_table IS '来源表名';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_column IS '来源字段名';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.file_key IS '文件存储的key';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_bucket IS '来源bucket文件空间';
+
+
+-- 文件操作日志表
+CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_opt_log (
+    id SERIAL PRIMARY KEY,
+    file_key VARCHAR(500) NOT NULL,
+    opt_type SMALLINT NOT NULL,
+	state boolean NOT NULL DEFAULT false,
+    file_size int8 NULL,
+    upload_time TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    qiniu_etag varchar(64) NOT NULL,
+    md5 VARCHAR(32) NOT NULL,
+    from_bucket VARCHAR(32),
+    to_bucket VARCHAR(32)
+);
+CREATE INDEX IF NOT EXISTS "IDX_file_opt_log_file_key" ON qiniu_cdnauth_file_opt_log (file_key);
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.opt_type IS '操作类型：1copy, 2move, 3delete';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.state IS '操作状态：1成功|0失败';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.file_size IS '文件大小';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.upload_time IS '上传时间';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.qiniu_etag IS '七牛返回的ETag';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.md5 IS '文件的MD5';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.from_bucket IS '来源bucket文件空间';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.to_bucket IS '目标bucket文件空间';
