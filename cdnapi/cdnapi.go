@@ -1,6 +1,7 @@
 package cdnapi
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/iotames/cdnguard/cdnapi/internal"
@@ -51,4 +52,17 @@ func (c CdnApi) ShowFilesInfo(bucketName, lastCursor string) error {
 		return err
 	}
 	return nil
+}
+
+func (c CdnApi) copyFiles(fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error)) error {
+	if c.cdnName == "qiniu" {
+		qiniu := qiniu.NewQiniuCdn(c.key, c.secret, c.bucketNameList)
+		qiniu.BatchCopyFile(fromBucket, toBucket, fileKeys, callback)
+		return nil
+	}
+	return fmt.Errorf("copy files only support qiniu")
+}
+
+func (c CdnApi) MigrateFiles(fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error)) error {
+	return c.copyFiles(fromBucket, toBucket, fileKeys, callback)
 }

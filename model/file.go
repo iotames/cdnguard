@@ -44,3 +44,22 @@ func BatchInsertQiniuFiles(bucketId int, files []storage.ListItem) (result sql.R
 	sql = fmt.Sprintf(sql, strings.Join(sqlvalues, ",")+";")
 	return getDB().Exec(sql, sqlargs...)
 }
+
+type MigrateFile struct {
+	FileUrl    string `db:"file_url"`
+	FileKey    string `db:"file_key"`
+	Status     int    `db:"status"`
+	FromBucket string `db:"from_bucket"`
+}
+
+// GetMigrateFiles 获取待迁移文件
+func GetMigrateFiles(dest *[]MigrateFile) error {
+	return getDB().GetMany("SELECT * FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 0", dest)
+}
+
+// UpdateMigrateFileStatus 变更迁移状态：-1 操作失败0未开始，1copy成功，2move成功，3原文件已删除
+func UpdateMigrateFileStatus(fileKey string, status int) (result sql.Result, err error) {
+	sql := `UPDATE qiniu_cdnauth_file_migrate_list SET status=$1, updated_at=CURRENT_TIMESTAMP WHERE file_key=$2`
+	// 添加文件操作记录
+	return getDB().Exec(sql, status, fileKey)
+}

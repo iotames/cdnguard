@@ -154,20 +154,22 @@ CREATE INDEX IF NOT EXISTS "IDX_statis_statis_date" ON qiniu_cdnauth_statis (sta
 -- 要迁移的文件列表
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_migrate_list (
     id SERIAL PRIMARY KEY,
-    file_url varchar(1000) NOT NULL,
+	file_url varchar(1000) NOT NULL,
+    file_key VARCHAR(500) NOT NULL,
 	status SMALLINT NOT NULL DEFAULT 0,
     from_table VARCHAR(64) NOT NULL,
-    from_column VARCHAR(64) NOT NULL,
-    file_key VARCHAR(500) NOT NULL,
+    from_column_name VARCHAR(64) NOT NULL,
+	from_column_value TEXT,
 	from_bucket VARCHAR(32),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS "IDX_file_migrate_list_file_key" ON qiniu_cdnauth_file_migrate_list (file_key);
 COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.file_url IS '文件原始URL';
-COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.status IS '迁移状态：0未开始，1copy成功，2move成功，3原文件已删除';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.status IS '迁移状态：-1操作失败0未开始，1copy成功，2move成功，3原文件已删除';
 COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_table IS '来源表名';
-COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_column IS '来源字段名';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_column_name IS '来源字段名';
+COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_column_value IS '来源字段值';
 COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.file_key IS '文件存储的key';
 COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_bucket IS '来源bucket文件空间';
 

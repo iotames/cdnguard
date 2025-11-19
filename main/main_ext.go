@@ -6,6 +6,7 @@ import (
 
 	"github.com/iotames/cdnguard"
 	"github.com/iotames/cdnguard/cdnapi"
+	"github.com/iotames/cdnguard/migrate"
 )
 
 // extCmdRun 运行扩展命令. 默认返回值true，表示命令执行结束。
@@ -47,6 +48,16 @@ func extCmdRun() bool {
 		}
 		return true
 	}
+	if FileMigrate {
+		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey, BucketNameList)
+		mg := migrate.NewFileMigrate(migrateFromHost, migrateToHost, migrateReferer, fromBucket, toBucket)
+		err := mg.Migrate(capi)
+		if err != nil {
+			panic(err)
+		}
+		return true
+	}
+
 	if AddBlackIps {
 		cdnguard.AddBlackIpList(RequestLimit)
 		return true

@@ -7,7 +7,7 @@
 4. Biz2: 文件上传地址从原`biz1-bucket`(`static.biz1.com`)切换为新的`newdomain1-biz2`(static1.biz2.newdomain1.com)
 
 第二步：搬迁旧文件（方法一）
-1. Biz2: 获取搬迁文件列表。存入七牛助手数据库qiniudb的 `file_migrate_list` 数据表: file_url(必填), from_table(必填), from_column(必填), file_key, created_at
+1. Biz2: 获取搬迁文件列表。存入七牛助手数据库qiniudb的 `file_migrate_list` 数据表: file_url(必填), from_table(必填), from_column_name(必填), file_key, created_at
 2. 七牛助手: 读取 `file_migrate_list` 数据表，并调用七牛云API【复制】文件到新的文件空间`newdomain1-biz2`。记录操作结果到 `file_opt_log` 日志表: file_key, opt_type(0copy,1move,3delete), status(1success|0fail), file_size, upload_time, created_at, qiniu_etag, md5, from_bucket, to_bucket
 3. Biz2: 更新数据库表，原有的`biz1-bucket`空间的文件资源路径，改为新的存储空间`newdomain1-biz2`的资源路径。
 4. 七牛助手：清理文件。读取 `file_opt_log` 日志表，并调用七牛云API【删除】迁移成功的原有文件（opt_type=0且status=1）。
@@ -32,7 +32,7 @@
 | file_url | VARCHAR(1000) | 是 | 无 | 文件原始URL |
 | status | SMALLINT | 否 | 0 | 迁移状态：0未开始，1copy成功，2move成功，3原文件已删除 |
 | from_table | VARCHAR(64) | 是 | 无 | 来源表名 |
-| from_column | VARCHAR(64) | 是 | 无 | 来源字段名 |
+| from_column_name | VARCHAR(64) | 是 | 无 | 来源字段名 |
 | file_key | VARCHAR(500) | 是 | 无 | 文件存储的key |
 | from_bucket | VARCHAR(32) | 否 | 无 | 来源bucket文件空间 |
 | created_at | TIMESTAMP | 否 | CURRENT_TIMESTAMP | 创建时间 |
