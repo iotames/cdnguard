@@ -57,6 +57,15 @@ func extCmdRun() bool {
 		}
 		return true
 	}
+	if FileDelete {
+		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey, BucketNameList)
+		mg := migrate.NewFileMigrate(migrateFromHost, migrateToHost, migrateReferer, fromBucket, toBucket)
+		err := mg.Delete(capi)
+		if err != nil {
+			panic(err)
+		}
+		return true
+	}
 
 	if AddBlackIps {
 		cdnguard.AddBlackIpList(RequestLimit)

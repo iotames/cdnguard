@@ -54,12 +54,51 @@ type MigrateFile struct {
 
 // GetMigrateFiles 获取待迁移文件
 func GetMigrateFiles(dest *[]MigrateFile) error {
-	return getDB().GetMany("SELECT * FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 0", dest)
+	return getDB().GetMany("SELECT file_key, status FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 0", dest)
 }
 
-// UpdateMigrateFileStatus 变更迁移状态：-1 操作失败0未开始，1copy成功，2move成功，3原文件已删除
-func UpdateMigrateFileStatus(fileKey string, status int) (result sql.Result, err error) {
-	sql := `UPDATE qiniu_cdnauth_file_migrate_list SET status=$1, updated_at=CURRENT_TIMESTAMP WHERE file_key=$2`
-	// 添加文件操作记录
-	return getDB().Exec(sql, status, fileKey)
+// GetDeleteFiles 获取待删除文件
+func GetDeleteFiles(fileKeys *[]string) error {
+	return getDB().GetMany("SELECT file_key FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 1", fileKeys)
+}
+
+// func BeginTx() (tx *sql.Tx, err error) {
+// 	return getDB().GetSqlDB().Begin()
+// }
+
+// LogFileMigrate 变更迁移状态，添加文件操作记录。-1 操作失败0未开始，1copy成功，2move成功，3原文件已删除
+func LogFileMigrate(opt, file_key, from_bucket, to_bucket string) error {
+	var err error
+	tx := getDB().GetSqlDB()
+	// tx, err := BeginTx()
+	// if err != nil {
+	// 	return err
+	// }
+	if opt == "copy" {
+		result, err = tx.Exec(`UPDATE qiniu_cdnauth_file_migrate_list SET status=$1, updated_at=CURRENT_TIMESTAMP WHERE file_key=$2`, 1, file_key)
+		if err != nil {
+			// tx.Rollback()
+			panic(err)
+		}
+		result, err = tx.Exec(`INSERT INTO qiniu_cdnauth_file_opt_log (file_key, opt_type, state, from_bucket, to_bucket)VALUES ($1, $2, $3, $4, $5);`, file_key, 1, true, from_bucket, to_bucket)
+		if err != nil {
+			// tx.Rollback()
+			panic(err)
+		}
+	}
+	if opt == "delete" {
+		_, err = tx.Exec(`UPDATE qiniu_cdnauth_file_migrate_list SET status=$1, updated_at=CURRENT_TIMESTAMP WHERE file_key=$2`, 3, file_key)
+		if err != nil {
+			panic(err)
+		}
+		_, err = tx.Exec(`INSERT INTO qiniu_cdnauth_file_opt_log (file_key, opt_type, state, from_bucket, to_bucket)VALUES ($1, $2, $3, $4, $5);`, file_key, 3, true, from_bucket, to_bucket)
+		if err != nil {
+			panic(err)
+		}
+	}
+	// else {
+	// 	tx.Rollback()
+	// }
+	// return tx.Commit()
+	return err
 }

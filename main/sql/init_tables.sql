@@ -154,11 +154,11 @@ CREATE INDEX IF NOT EXISTS "IDX_statis_statis_date" ON qiniu_cdnauth_statis (sta
 -- 要迁移的文件列表
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_migrate_list (
     id SERIAL PRIMARY KEY,
-	file_url varchar(1000) NOT NULL,
+	file_url varchar(1000) DEFAULT NULL,
     file_key VARCHAR(500) NOT NULL,
 	status SMALLINT NOT NULL DEFAULT 0,
-    from_table VARCHAR(64) NOT NULL,
-    from_column_name VARCHAR(64) NOT NULL,
+    from_table VARCHAR(64) DEFAULT NULL,
+    from_column_name VARCHAR(64) DEFAULT NULL,
 	from_column_value TEXT,
 	from_bucket VARCHAR(32),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -180,11 +180,11 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_opt_log (
     file_key VARCHAR(500) NOT NULL,
     opt_type SMALLINT NOT NULL,
 	state boolean NOT NULL DEFAULT false,
-    file_size int8 NULL,
-    upload_time TIMESTAMP,
+    file_size int8 DEFAULT NULL,
+    upload_time TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    qiniu_etag varchar(64) NOT NULL,
-    md5 VARCHAR(32) NOT NULL,
+    qiniu_etag varchar(64) DEFAULT NULL,
+    md5 VARCHAR(32) DEFAULT NULL,
     from_bucket VARCHAR(32),
     to_bucket VARCHAR(32)
 );

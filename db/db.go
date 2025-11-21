@@ -31,6 +31,10 @@ func GetDb(oncedb *DB) *DB {
 	return db
 }
 
+func (d *DB) GetSqlDB() *sql.DB {
+	return d.edb.GetSqlDB()
+}
+
 // DB结构体和方法，只给main,model调用
 func NewDb(driverName, dbHost, dbUser, dbPassword, dbName string, dbPort int) *DB {
 	var err error

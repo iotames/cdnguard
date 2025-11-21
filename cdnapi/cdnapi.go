@@ -3,6 +3,7 @@ package cdnapi
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/iotames/cdnguard/cdnapi/internal"
 	"github.com/iotames/cdnguard/cdnapi/internal/qiniu"
@@ -63,6 +64,24 @@ func (c CdnApi) copyFiles(fromBucket, toBucket string, fileKeys []string, callba
 	return fmt.Errorf("copy files only support qiniu")
 }
 
-func (c CdnApi) MigrateFiles(fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error)) error {
-	return c.copyFiles(fromBucket, toBucket, fileKeys, callback)
+func (c CdnApi) DeleteFiles(bucketName string, fileKeys []string, callback func(fkey string, err error)) error {
+	if len(fileKeys) == 0 {
+		return fmt.Errorf("fileKeys is empty")
+	}
+	if c.cdnName == "qiniu" {
+		qiniu := qiniu.NewQiniuCdn(c.key, c.secret, c.bucketNameList)
+		qiniu.BatchDeleteFile(bucketName, fileKeys, callback)
+		return nil
+	}
+	return fmt.Errorf("delete files only support qiniu")
+}
+
+func (c CdnApi) MigrateFiles(opt string, fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error)) error {
+	if len(fileKeys) == 0 {
+		return fmt.Errorf("fileKeys is empty")
+	}
+	if strings.EqualFold(opt, "copy") {
+		return c.copyFiles(fromBucket, toBucket, fileKeys, callback)
+	}
+	return fmt.Errorf("migrate files only support copy")
 }

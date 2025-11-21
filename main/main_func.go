@@ -21,7 +21,7 @@ var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey string
 var LastCursorMarker string
 var DbPort, WebPort, RequestLimit int
 var Debug, Prune, AddBlackIps, SyncBucketFiles, ShowBucketFiles, StatisEveryDay, DbStats bool
-var FileMigrate bool
+var FileMigrate, FileDelete bool
 var BucketNameList []string
 var migrateFromHost, migrateToHost, migrateReferer, fromBucket, toBucket string
 
@@ -83,6 +83,7 @@ func parseCmd() {
 	flag.StringVar(&BucketName, "bucketname", "", "bucket name")
 	flag.StringVar(&LastCursorMarker, "lastcursor", "", "上一次列表的最后一条数据标记")
 	flag.BoolVar(&FileMigrate, "filemigrate", false, "file migrate")
+	flag.BoolVar(&FileDelete, "filedelete", false, "file delete")
 	flag.Parse()
 }
 
