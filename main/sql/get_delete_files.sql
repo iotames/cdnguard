@@ -1,0 +1,1 @@
+SELECT file_key FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 1;

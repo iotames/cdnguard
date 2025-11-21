@@ -79,6 +79,38 @@ nohup ./main --syncbucketfiles > syncfiles.log 2>&1 &
 
 注：如果 `--bucketname` 指定的值不在 `.env` 文件的 `BUCKET_NAME_LIST` 中，会提示错误。
 
+### 文件迁移
+
+1. 配置 `.env`
+
+```conf
+# 文件迁移前的空间名
+MIGRATE_FROM_BUCKET = "origin-bucket"
+# 文件迁移后的空间名
+MIGRATE_TO_BUCKET = "target-bucket"
+```
+
+2. 更新待迁移文件列表: `qiniu_cdnauth_file_migrate_list`。 必填字段 `file_key`。`status = 0` 表示待迁移。
+
+3. 执行迁移任务，使用 `复制` 方式迁移: `./main --filemigrate` 根据待迁移文件列表，调用API复制文件到新空间。数据表 `qiniu_cdnauth_file_migrate_list` 更新 `status = 1` 表示已复制。
+
+4. 删除迁移成功的文件: `./main --filedelete` 根据 `qiniu_cdnauth_file_migrate_list` 表 `status = 1`，删除 `复制` 成功的文件。数据表 `qiniu_cdnauth_file_migrate_list` 更新 `status = 3` 表示原文件已删除。
+
+```bash
+# 显示待迁移文件列表
+./main --showmigratefiles
+
+# 以复制文件的方式，执行文件迁移
+./main --filemigrate
+
+# 显示待删除文件列表
+./main --showdeletefiles 
+
+# 删除迁移成功的文件
+./main --filedelete
+```
+
+
 ## Systemd系统服务
 
 ### 系统服务配置

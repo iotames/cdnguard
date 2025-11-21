@@ -6,21 +6,22 @@ import (
 	"github.com/iotames/cdnguard/model"
 )
 
+func GetMigrateFiles() (fileKeys []string, err error) {
+	err = model.GetMigrateFiles(&fileKeys)
+	if err != nil {
+		return
+	}
+	log.Debug("FileMigrate.GetMigrateFiles", "fileKeys", fileKeys)
+	return
+}
+
 // 使用事务保证操作的原子性
 // https://developer.qiniu.com/kodo/1250/batch
 func (m FileMigrate) Migrate(capi *cdnapi.CdnApi) error {
-
-	migrateFiles := []model.MigrateFile{}
-	err := model.GetMigrateFiles(&migrateFiles)
+	fileKeys, err := GetMigrateFiles()
 	if err != nil {
 		return err
 	}
-	fileKeys := []string{}
-	for _, migrateFile := range migrateFiles {
-		log.Debug("FileMigrate.Migrate append fileKeys", "fileKey", migrateFile.FileKey)
-		fileKeys = append(fileKeys, migrateFile.FileKey)
-	}
-
 	return capi.MigrateFiles("copy", m.fromBucket, m.toBucket, fileKeys, func(fkey string, err error) {
 		if err != nil {
 			log.Error("FileMigrate.Migrate error", "fileKey", fkey, "err", err)
@@ -31,14 +32,22 @@ func (m FileMigrate) Migrate(capi *cdnapi.CdnApi) error {
 	})
 }
 
-// 删除文件
+func GetDeleteFiles() (fileKeys []string, err error) {
+	err = model.GetDeleteFiles(&fileKeys)
+	if err != nil {
+		return
+	}
+	log.Debug("FileMigrate.GetDeleteFiles", "fileKeys", fileKeys)
+	return
+}
+
+// Delete 删除文件
 func (m FileMigrate) Delete(capi *cdnapi.CdnApi) error {
-	var deleteFiles []string
-	err := model.GetDeleteFiles(&deleteFiles)
+	deleteFiles, err := GetDeleteFiles()
 	if err != nil {
 		return err
 	}
-	log.Debug("FileMigrate.Delete", "bucketName", m.fromBucket, "deleteFiles", deleteFiles)
+	log.Debug("FileMigrate.Delete", "bucketName", m.fromBucket)
 	return capi.DeleteFiles(m.fromBucket, deleteFiles, func(fkey string, err error) {
 		if err != nil {
 			log.Error("FileMigrate.DeleteFiles error", "fileKey", fkey, "err", err)

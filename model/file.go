@@ -53,13 +53,15 @@ type MigrateFile struct {
 }
 
 // GetMigrateFiles 获取待迁移文件
-func GetMigrateFiles(dest *[]MigrateFile) error {
-	return getDB().GetMany("SELECT file_key, status FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 0", dest)
+func GetMigrateFiles(fileKeys *[]string) error {
+	// return getDB().GetMany("SELECT file_key, status FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 0", dest)
+	return getDB().GetAllBySqlFile("get_migrate_files.sql", fileKeys)
 }
 
 // GetDeleteFiles 获取待删除文件
 func GetDeleteFiles(fileKeys *[]string) error {
-	return getDB().GetMany("SELECT file_key FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 1", fileKeys)
+	// return getDB().GetMany("SELECT file_key FROM public.qiniu_cdnauth_file_migrate_list WHERE status = 1", fileKeys)
+	return getDB().GetAllBySqlFile("get_delete_files.sql", fileKeys)
 }
 
 // func BeginTx() (tx *sql.Tx, err error) {
