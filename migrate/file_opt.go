@@ -15,9 +15,8 @@ func GetMigrateFiles() (fileKeys []string, err error) {
 	return
 }
 
-// 使用事务保证操作的原子性
-// https://developer.qiniu.com/kodo/1250/batch
-func (m FileMigrate) Migrate(capi *cdnapi.CdnApi) error {
+// Migrate 迁移文件
+func (m FileMigrate) Migrate(capi *cdnapi.CdnApi, addPreDir string) error {
 	fileKeys, err := GetMigrateFiles()
 	if err != nil {
 		return err
@@ -26,10 +25,10 @@ func (m FileMigrate) Migrate(capi *cdnapi.CdnApi) error {
 		if err != nil {
 			log.Error("FileMigrate.Migrate error", "fileKey", fkey, "err", err)
 		} else {
-			model.LogFileMigrate("copy", fkey, m.fromBucket, m.toBucket)
+			model.LogFileMigrate("copy", fkey, m.fromBucket, m.toBucket, addPreDir)
 			log.Info("SUCCESS! FileMigrate.Migrate Copy Done", "fileKey", fkey)
 		}
-	})
+	}, addPreDir)
 }
 
 func GetDeleteFiles() (fileKeys []string, err error) {
@@ -52,7 +51,7 @@ func (m FileMigrate) Delete(capi *cdnapi.CdnApi) error {
 		if err != nil {
 			log.Error("FileMigrate.DeleteFiles error", "fileKey", fkey, "err", err)
 		} else {
-			model.LogFileMigrate("delete", fkey, m.fromBucket, m.toBucket)
+			model.LogFileMigrate("delete", fkey, m.fromBucket, m.toBucket, "")
 			log.Info("SUCCESS! FileMigrate.Delete Done", "bucketName", m.fromBucket, "fileKey", fkey)
 		}
 	})

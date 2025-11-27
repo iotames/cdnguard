@@ -61,7 +61,7 @@ func extCmdRun() bool {
 	if FileMigrate {
 		capi := cdnapi.NewCdnApi(CdnName, QiniuAccessKey, QiniuSecretKey, BucketNameList)
 		mg := migrate.NewFileMigrate(migrateFromHost, migrateToHost, migrateReferer, fromBucket, toBucket)
-		err := mg.Migrate(capi)
+		err := mg.Migrate(capi, AddPreDir)
 		if err != nil {
 			panic(err)
 		}

@@ -102,9 +102,11 @@ MIGRATE_TO_BUCKET = "target-bucket"
 
 # 以复制文件的方式，执行文件迁移
 ./main --filemigrate
+# 迁移的时候，给目标路径，添加前缀目录。不能以/符号开头或结尾。
+./main --filemigrate --addpredir=email
 
 # 显示待删除文件列表
-./main --showdeletefiles 
+./main --showdeletefiles
 
 # 删除迁移成功的文件
 ./main --filedelete

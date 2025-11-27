@@ -55,10 +55,13 @@ func (c CdnApi) ShowFilesInfo(bucketName, lastCursor string) error {
 	return nil
 }
 
-func (c CdnApi) copyFiles(fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error)) error {
+func (c CdnApi) copyFiles(fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error), addPreDir string) error {
+	if strings.HasPrefix(addPreDir, `/`) || strings.HasSuffix(addPreDir, `/`) {
+		return fmt.Errorf("addPreDir must not start or end with /")
+	}
 	if c.cdnName == "qiniu" {
 		qiniu := qiniu.NewQiniuCdn(c.key, c.secret, c.bucketNameList)
-		qiniu.BatchCopyFile(fromBucket, toBucket, fileKeys, callback)
+		qiniu.BatchCopyFile(fromBucket, toBucket, fileKeys, callback, addPreDir)
 		return nil
 	}
 	return fmt.Errorf("copy files only support qiniu")
@@ -76,12 +79,15 @@ func (c CdnApi) DeleteFiles(bucketName string, fileKeys []string, callback func(
 	return fmt.Errorf("delete files only support qiniu")
 }
 
-func (c CdnApi) MigrateFiles(opt string, fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error)) error {
+func (c CdnApi) MigrateFiles(opt string, fromBucket, toBucket string, fileKeys []string, callback func(fkey string, err error), addPreDir string) error {
 	if len(fileKeys) == 0 {
 		return fmt.Errorf("fileKeys is empty")
 	}
+	if strings.HasPrefix(addPreDir, `/`) || strings.HasSuffix(addPreDir, `/`) {
+		return fmt.Errorf("addPreDir must not start or end with /")
+	}
 	if strings.EqualFold(opt, "copy") {
-		return c.copyFiles(fromBucket, toBucket, fileKeys, callback)
+		return c.copyFiles(fromBucket, toBucket, fileKeys, callback, addPreDir)
 	}
 	return fmt.Errorf("migrate files only support copy")
 }

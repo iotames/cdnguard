@@ -17,7 +17,7 @@ const DEFALUT_SQL_DIR = "sql"
 var gdb *db.DB
 var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
-var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey string
+var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey, AddPreDir string
 var LastCursorMarker string
 var DbPort, WebPort, RequestLimit int
 var Debug, Prune, AddBlackIps, SyncBucketFiles, ShowBucketFiles, StatisEveryDay, DbStats bool
@@ -81,6 +81,7 @@ func parseCmd() {
 	flag.BoolVar(&DbStats, "dbstats", false, "db stats")
 	flag.StringVar(&CdnName, "cdnname", "qiniu", "cdn name")
 	flag.StringVar(&BucketName, "bucketname", "", "bucket name")
+	flag.StringVar(&AddPreDir, "addpredir", "", "给要操作的文件路径添加目录前缀。不能以/符号开头或结尾。")
 	flag.StringVar(&LastCursorMarker, "lastcursor", "", "上一次列表的最后一条数据标记")
 	flag.BoolVar(&FileMigrate, "filemigrate", false, "file migrate")
 	flag.BoolVar(&FileDelete, "filedelete", false, "file delete")

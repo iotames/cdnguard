@@ -69,7 +69,8 @@ func GetDeleteFiles(fileKeys *[]string) error {
 // }
 
 // LogFileMigrate 变更迁移状态，添加文件操作记录。-1 操作失败0未开始，1copy成功，2move成功，3原文件已删除
-func LogFileMigrate(opt, file_key, from_bucket, to_bucket string) error {
+// 仅opt=copy时，支持传入addPreDir参数。其他情况请传入空字符串
+func LogFileMigrate(opt, file_key, from_bucket, to_bucket, addPreDir string) error {
 	var err error
 	tx := getDB().GetSqlDB()
 	// tx, err := BeginTx()
@@ -82,7 +83,7 @@ func LogFileMigrate(opt, file_key, from_bucket, to_bucket string) error {
 			// tx.Rollback()
 			panic(err)
 		}
-		result, err = tx.Exec(`INSERT INTO qiniu_cdnauth_file_opt_log (file_key, opt_type, state, from_bucket, to_bucket)VALUES ($1, $2, $3, $4, $5);`, file_key, 1, true, from_bucket, to_bucket)
+		result, err = tx.Exec(`INSERT INTO qiniu_cdnauth_file_opt_log (file_key, opt_type, state, from_bucket, to_bucket, add_pre_dir)VALUES ($1, $2, $3, $4, $5, $6);`, file_key, 1, true, from_bucket, to_bucket, addPreDir)
 		if err != nil {
 			// tx.Rollback()
 			panic(err)

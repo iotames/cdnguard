@@ -178,6 +178,7 @@ COMMENT ON COLUMN qiniu_cdnauth_file_migrate_list.from_bucket IS '来源bucket�
 CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_opt_log (
     id SERIAL PRIMARY KEY,
     file_key VARCHAR(500) NOT NULL,
+	add_pre_dir VARCHAR(32),
     opt_type SMALLINT NOT NULL,
 	state boolean NOT NULL DEFAULT false,
     file_size int8 DEFAULT NULL,
@@ -190,6 +191,7 @@ CREATE TABLE IF NOT EXISTS qiniu_cdnauth_file_opt_log (
 );
 CREATE INDEX IF NOT EXISTS "IDX_file_opt_log_file_key" ON qiniu_cdnauth_file_opt_log (file_key);
 COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.opt_type IS '操作类型：1copy, 2move, 3delete';
+COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.add_pre_dir IS '添加前缀目录';
 COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.state IS '操作状态：1成功|0失败';
 COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.file_size IS '文件大小';
 COMMENT ON COLUMN qiniu_cdnauth_file_opt_log.upload_time IS '上传时间';
