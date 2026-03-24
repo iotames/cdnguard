@@ -77,13 +77,22 @@ func LogFileMigrate(opt, file_key, from_bucket, to_bucket, addPreDir string) err
 	// if err != nil {
 	// 	return err
 	// }
-	if opt == "copy" {
-		result, err = tx.Exec(`UPDATE qiniu_cdnauth_file_migrate_list SET status=$1, updated_at=CURRENT_TIMESTAMP WHERE file_key=$2`, 1, file_key)
+	optType := -1
+	switch opt {
+	case "copy":
+		optType = 1
+	case "move":
+		optType = 2
+	case "delete":
+		optType = 3
+	}
+	if opt == "copy" || opt == "move" {
+		result, err = tx.Exec(`UPDATE qiniu_cdnauth_file_migrate_list SET status=$1, updated_at=CURRENT_TIMESTAMP WHERE file_key=$2`, optType, file_key)
 		if err != nil {
 			// tx.Rollback()
 			panic(err)
 		}
-		result, err = tx.Exec(`INSERT INTO qiniu_cdnauth_file_opt_log (file_key, opt_type, state, from_bucket, to_bucket, add_pre_dir)VALUES ($1, $2, $3, $4, $5, $6);`, file_key, 1, true, from_bucket, to_bucket, addPreDir)
+		result, err = tx.Exec(`INSERT INTO qiniu_cdnauth_file_opt_log (file_key, opt_type, state, from_bucket, to_bucket, add_pre_dir)VALUES ($1, $2, $3, $4, $5, $6);`, file_key, optType, true, from_bucket, to_bucket, addPreDir)
 		if err != nil {
 			// tx.Rollback()
 			panic(err)

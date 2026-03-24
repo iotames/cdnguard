@@ -22,6 +22,22 @@ func (q QiniuCdn) BatchCopyFile(bucketSrc, bucketDest string, fileKeys []string,
 	}
 }
 
+// BatchMoveFile 批量移动文件。保持文件key不变，从源bucket移动到目标bucket。
+func (q QiniuCdn) BatchMoveFile(bucketSrc, bucketDest string, fileKeys []string, callback func(fkey string, err error), addPreDir string) {
+	if strings.HasPrefix(addPreDir, `/`) || strings.HasSuffix(addPreDir, `/`) {
+		panic("addPreDir must not start or end with /")
+	}
+	var err error
+	for _, fileKey := range fileKeys {
+		destFileKey := fileKey
+		if addPreDir != "" {
+			destFileKey = addPreDir + "/" + fileKey
+		}
+		err = q.bucketManager.Move(bucketSrc, fileKey, bucketDest, destFileKey, false)
+		callback(fileKey, err)
+	}
+}
+
 // BatchDeleteFile 批量删除文件。
 func (q QiniuCdn) BatchDeleteFile(bucketName string, fileKeys []string, callback func(fkey string, err error)) {
 	var err error

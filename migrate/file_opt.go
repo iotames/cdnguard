@@ -16,17 +16,17 @@ func GetMigrateFiles() (fileKeys []string, err error) {
 }
 
 // Migrate 迁移文件
-func (m FileMigrate) Migrate(capi *cdnapi.CdnApi, addPreDir string) error {
+func (m FileMigrate) Migrate(capi *cdnapi.CdnApi, addPreDir, migrateType string) error {
 	fileKeys, err := GetMigrateFiles()
 	if err != nil {
 		return err
 	}
-	return capi.MigrateFiles("copy", m.fromBucket, m.toBucket, fileKeys, func(fkey string, err error) {
+	return capi.MigrateFiles(migrateType, m.fromBucket, m.toBucket, fileKeys, func(fkey string, err error) {
 		if err != nil {
 			log.Error("FileMigrate.Migrate error", "fileKey", fkey, "err", err)
 		} else {
-			model.LogFileMigrate("copy", fkey, m.fromBucket, m.toBucket, addPreDir)
-			log.Info("SUCCESS! FileMigrate.Migrate Copy Done", "fileKey", fkey)
+			model.LogFileMigrate(migrateType, fkey, m.fromBucket, m.toBucket, addPreDir)
+			log.Info("SUCCESS! FileMigrate.Migrate Done", "migrateType", migrateType, "fileKey", fkey)
 		}
 	}, addPreDir)
 }

@@ -40,7 +40,7 @@ BUCKET_NAME_LIST="bucket123,bucket456,bucket789"
 ```bash
 # 启动监听端口为1212的守护进程
 # 修改main目录下的.env文件以修改系统配置
-./main
+main.exe
 ```
 
 ### 数据表清理
@@ -48,7 +48,7 @@ BUCKET_NAME_LIST="bucket123,bucket456,bucket789"
 ```bash
 # 数据表清理
 # SQL文件：./main/sql/prune.sql
-./main --prune
+main.exe --prune
 ```
 
 ### 添加黑名单IP
@@ -57,21 +57,21 @@ BUCKET_NAME_LIST="bucket123,bucket456,bucket789"
 # 获取当天1点后，5点前，网络请求的referer为空，且请求最多的IP
 # 该时间段内，请求数超过1600，把IP加入黑名单
 # 请求数限制REQUEST_LIMIT=1600。可通过 main/.env 文件修改。
-./main --addblackips
+main.exe --addblackips
 ```
 
 ### 同步Bucket空间的文件
 
 ```bash
 # 同步Bucket空间文件
-./main --syncbucketfiles --bucketname=bucket123 --cdnname=qiniu
+main.exe --syncbucketfiles --bucketname=bucket123 --cdnname=qiniu
 
 # cdnname为CDN服务商名称。可省略。默认为：qiniu
 # bucketname为空间名称。必填。不可省略。
-./main --syncbucketfiles --bucketname=bucket123
+main.exe --syncbucketfiles --bucketname=bucket123
 
 # 更换Bucket空间
-./main --syncbucketfiles --bucketname=bucket789
+main.exe --syncbucketfiles --bucketname=bucket789
 
 # 放到后台运行
 nohup ./main --syncbucketfiles > syncfiles.log 2>&1 &
@@ -92,24 +92,28 @@ MIGRATE_TO_BUCKET = "target-bucket"
 
 2. 更新待迁移文件列表: `qiniu_cdnauth_file_migrate_list`。 必填字段 `file_key`。`status = 0` 表示待迁移。
 
-3. 执行迁移任务，使用 `复制` 方式迁移: `./main --filemigrate` 根据待迁移文件列表，调用API复制文件到新空间。数据表 `qiniu_cdnauth_file_migrate_list` 更新 `status = 1` 表示已复制。
+3. 执行迁移任务，使用 `复制` 方式迁移: `main.exe --filemigrate` 根据待迁移文件列表，调用API复制文件到新空间。数据表 `qiniu_cdnauth_file_migrate_list` 更新 `status = 1` 表示已复制。
 
-4. 删除迁移成功的文件: `./main --filedelete` 根据 `qiniu_cdnauth_file_migrate_list` 表 `status = 1`，删除 `复制` 成功的文件。数据表 `qiniu_cdnauth_file_migrate_list` 更新 `status = 3` 表示原文件已删除。
+4. 删除迁移成功的文件: `main.exe --filedelete` 根据 `qiniu_cdnauth_file_migrate_list` 表 `status = 1`，删除 `复制` 成功的文件。数据表 `qiniu_cdnauth_file_migrate_list` 更新 `status = 3` 表示原文件已删除。
 
 ```bash
 # 显示待迁移文件列表
-./main --showmigratefiles
+main.exe --showmigratefiles
 
 # 以复制文件的方式，执行文件迁移
-./main --filemigrate
+main.exe --filemigrate
+
+# 以移动文件的方式，执行文件迁移
+main.exe --filemigrate migratetype=move
+
 # 迁移的时候，给目标路径，添加前缀目录。不能以/符号开头或结尾。
-./main --filemigrate --addpredir=email
+main.exe --filemigrate --addpredir=email
 
 # 显示待删除文件列表
-./main --showdeletefiles
+main.exe --showdeletefiles
 
 # 删除迁移成功的文件
-./main --filedelete
+main.exe --filedelete
 ```
 
 

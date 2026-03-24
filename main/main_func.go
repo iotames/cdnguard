@@ -17,7 +17,7 @@ const DEFALUT_SQL_DIR = "sql"
 var gdb *db.DB
 var SqlDir string
 var DbDriverName, DbHost, DbUser, DbPassword, DbName string
-var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey, AddPreDir string
+var CdnName, BucketName, QiniuAccessKey, QiniuSecretKey, AddPreDir, MigrateType string
 var LastCursorMarker string
 var DbPort, WebPort, RequestLimit int
 var Debug, Prune, AddBlackIps, SyncBucketFiles, ShowBucketFiles, StatisEveryDay, DbStats bool
@@ -87,6 +87,7 @@ func parseCmd() {
 	flag.BoolVar(&FileDelete, "filedelete", false, "file delete")
 	flag.BoolVar(&ShowMigrateFiles, "showmigratefiles", false, "show migrate files")
 	flag.BoolVar(&ShowDeleteFiles, "showdeletefiles", false, "show delete files")
+	flag.StringVar(&MigrateType, "migratetype", "copy", "migrate type: copy,move")
 	flag.Parse()
 }
 
